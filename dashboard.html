@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <span>📋 ระบบจัดการข้อมูล</span>
+    <div>
+      <span id="nav-username"></span>
+      <button onclick="logout()">ออกจากระบบ</button>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- ฟอร์มเพิ่มข้อมูล -->
+    <div class="card">
+      <h3>➕ เพิ่มข้อมูล</h3>
+      <input type="text" id="input-title" placeholder="หัวข้อ" />
+      <textarea id="input-detail" placeholder="รายละเอียด"></textarea>
+      <button onclick="submitData()">บันทึก</button>
+      <div id="save-msg" class="hidden"></div>
+    </div>
+
+    <!-- ตารางแสดงข้อมูล -->
+    <div class="card">
+      <h3>📊 ข้อมูลทั้งหมด</h3>
+      <button onclick="loadData()" style="margin-bottom:12px">🔄 โหลดข้อมูล</button>
+      <div id="data-table"></div>
+    </div>
+  </div>
+
+  <script type="module" src="dist/dashboard.js"></script>
+</body>
+</html>

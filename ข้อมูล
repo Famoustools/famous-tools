@@ -1,0 +1,12 @@
+# สร้างโฟลเดอร์โปรเจค
+mkdir my-project
+cd my-project
+
+# เริ่ม project
+npm init -y
+
+# ติดตั้ง TypeScript
+npm install -D typescript
+
+# สร้าง tsconfig
+npx tsc --init
