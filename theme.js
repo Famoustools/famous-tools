@@ -103,10 +103,10 @@ function showToast(message, type = 'info', duration = 3000) {
 // ── AUTH GUARD ─────────────────────────────────────────
 function authGuard(requiredPerm) {
   const token = sessionStorage.getItem('token');
-  if (!token) { window.location.href = 'index.html'; return false; }
+  if (!token) { window.location.replace('index.html'); return false; }
   if (requiredPerm && !hasPerm(requiredPerm)) {
     showToast('คุณไม่มีสิทธิ์เข้าถึงหน้านี้', 'error');
-    setTimeout(() => window.location.href = 'dashboard1.html', 1500);
+    setTimeout(() => window.location.replace('dashboard1.html'), 1500);
     return false;
   }
   return true;
