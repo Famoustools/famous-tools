@@ -455,7 +455,7 @@
           const btnEl = document.getElementById('btn');
           spawnParticles(btnEl.getBoundingClientRect().left, btnEl.getBoundingClientRect().top);
 
-          setTimeout(() => { window.location.href = 'dashboard1.html'; }, 1500);
+          setTimeout(() => { window.location.replace('dashboard1.html'); }, 1500);
         } else {
           errText.textContent = data.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง';
           errEl.style.display = 'flex';

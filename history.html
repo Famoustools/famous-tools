@@ -231,17 +231,25 @@
 
     function formatDatetime(raw) {
       if (!raw || raw === '—') return '—';
-      if (/^\d{2}\/\d{2}\/\d{4}/.test(raw)) return raw;
+      if (/^\d{2}\/\d{2}\/\d{4}/.test(raw)) {
+        // แปลง dd/mm/yyyy HH:MM → Thai full format
+        const parts = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+        if (parts) {
+          const months = ['','มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+          return `${parseInt(parts[1])} ${months[parseInt(parts[2])]} ${parts[3]} เวลา ${parts[4]}:${parts[5]} น.`;
+        }
+        return raw;
+      }
       const cleaned = String(raw).replace('น.', '').trim();
       const d = new Date(cleaned);
       if (isNaN(d)) return raw;
-      const dd   = String(d.getDate()).padStart(2, '0');
-      const mm   = String(d.getMonth() + 1).padStart(2, '0');
+      const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+      const day  = d.getDate();
+      const mon  = months[d.getMonth()];
       const yyyy = d.getFullYear();
       const hh   = String(d.getHours()).padStart(2, '0');
       const min  = String(d.getMinutes()).padStart(2, '0');
-      const ss   = String(d.getSeconds()).padStart(2, '0');
-      return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+      return `${day} ${mon} ${yyyy} เวลา ${hh}:${min} น.`;
     }
 
     const STEPS = [

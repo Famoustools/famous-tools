@@ -202,19 +202,18 @@
 
     function formatDatetime(raw) {
       if (!raw || raw === '—') return '—';
-      // ถ้าเป็นรูปแบบ dd/mm/yyyy hh:mm:ss อยู่แล้ว → คืนค่าเลย
-      if (/^\d{2}\/\d{2}\/\d{4}/.test(raw)) return raw;
-      // parse จาก Date string ที่ browser ส่งมา
+      const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+      if (/^\d{2}\/\d{2}\/\d{4}/.test(raw)) {
+        const p = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+        if (p) return `${parseInt(p[1])} ${months[parseInt(p[2])-1]} ${p[3]} เวลา ${p[4]}:${p[5]} น.`;
+        return raw;
+      }
       const cleaned = String(raw).replace('น.', '').trim();
       const d = new Date(cleaned);
-      if (isNaN(d)) return raw; // parse ไม่ได้ → คืนค่าเดิม
-      const dd   = String(d.getDate()).padStart(2, '0');
-      const mm   = String(d.getMonth() + 1).padStart(2, '0');
-      const yyyy = d.getFullYear(); // แปลงเป็น พ.ศ.
-      const hh   = String(d.getHours()).padStart(2, '0');
-      const min  = String(d.getMinutes()).padStart(2, '0');
-      const ss   = String(d.getSeconds()).padStart(2, '0');
-      return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+      if (isNaN(d)) return raw;
+      const hh  = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} เวลา ${hh}:${min} น.`;
     }
   </script>
 </body>

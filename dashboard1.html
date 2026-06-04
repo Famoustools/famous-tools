@@ -1404,15 +1404,22 @@
     // ── EXPORT CSV ────────────────────────────────────────
     function exportCSV() {
       if (!hasPerm('export')) { showToast('ไม่มีสิทธิ์ Export','error'); return; }
-      const rows = [['Ref','ชื่องาน','จำนวน','Priority','Status','กำหนด']];
-      filtered.forEach(d => rows.push([d.ref,d.title,d.qty,d.priority,d.status,d.duedate]));
+      const source = (filtered && filtered.length > 0) ? filtered : allData;
+      if (!source || source.length === 0) { showToast('ไม่มีข้อมูลที่จะ Export','warn'); return; }
+      const rows = [['ref (รหัสสินค้า / เลขงาน)','title (ชื่องาน)','qty (จำนวนงาน)','priority (ความสำคัญ (ด่วน / ปกติ))','status (สถานะ)','startdate (วันที่เพิ่มงาน)','duedate (วันที่กำหนดส่ง)','remark (หมายเหตุ)']];
+      source.forEach(d => rows.push([
+        d.ref||'', d.title||'', d.qty||'',
+        d.priority||'', d.status||'',
+        d.startdate||'', d.duedate||'',
+        d.remark||''
+      ]));
       const csv = rows.map(r => r.map(v => `"${String(v||'').replace(/"/g,'""')}"`).join(',')).join('\n');
       const blob = new Blob(['\uFEFF'+csv], { type:'text/csv;charset=utf-8;' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'data_' + new Date().toISOString().slice(0,10) + '.csv';
+      a.download = 'งาน_' + new Date().toISOString().slice(0,10) + '.csv';
       a.click();
-      showToast('Export สำเร็จ', 'success');
+      showToast(`Export สำเร็จ (${source.length} รายการ)`, 'success');
     }
 
     // ── MODAL HELPERS ─────────────────────────────────────
