@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+  <style id="admin-hide">.admin-item{display:none!important}.admin-item::after{content:none!important}.admin-label{display:none!important}</style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Famous Tools - กระบวนการผลิต</title>
@@ -76,7 +77,6 @@
     .prod-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.1); }
     [data-theme="light"] .prod-card { box-shadow:0 2px 8px rgba(0,0,0,0.05); }
     [data-theme="light"] .prod-card:hover { box-shadow:0 8px 24px rgba(0,0,0,0.1); }
-
     /* color strip top per status */
     .prod-card.status-0 { border-top:3px solid #818cf8; }
     .prod-card.status-1 { border-top:3px solid #f59e0b; }
@@ -175,6 +175,60 @@
     .modal-bg { display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:20px; }
     .modal-bg.show { display:flex; }
     .modal { background:var(--card); border:1px solid var(--accent-border-dim); border-top:3px solid var(--accent); border-radius:14px; padding:24px; width:580px; max-width:95vw; max-height:90vh; overflow-y:auto; animation:fadeUp 0.2s ease both; }
+
+    /* View Detail Modal */
+    .modal-view { width:660px; }
+    .vd-section { margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid var(--accent-border-dim); }
+    .vd-section:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
+    .vd-section-title { font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+    .vd-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .vd-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+    .vd-item { background:var(--input); border:1px solid var(--accent-border-dim); border-radius:8px; padding:10px 13px; }
+    .vd-label { font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
+    .vd-value { font-size:13px; color:var(--text-primary); font-weight:500; }
+    .vd-remark { background:var(--input); border:1px solid var(--accent-border-dim); border-radius:8px; padding:10px 13px; font-size:13px; color:var(--text-secondary); line-height:1.6; }
+
+    /* Pipeline in modal */
+    .vd-pipeline { display:flex; align-items:center; padding:12px 0 4px; gap:0; }
+    .vd-pipeline .pipe-step { gap:6px; }
+    .vd-pipeline .pipe-dot { width:32px; height:32px; font-size:14px; }
+    .vd-pipeline .pipe-label { font-size:10px; }
+
+    /* Log list in modal */
+    .vd-log-list { display:flex; flex-direction:column; gap:0; }
+    .vd-log-item { display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid var(--accent-border-dim); }
+    .vd-log-item:last-child { border-bottom:none; }
+    .vd-log-num { width:22px; height:22px; border-radius:50%; background:var(--accent-dim); border:1px solid var(--accent-border); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--accent-light); flex-shrink:0; }
+    .vd-log-step { font-weight:700; color:var(--text-primary); font-size:12px; min-width:80px; }
+    .vd-log-by { font-size:12px; color:var(--text-secondary); flex:1; display:flex; align-items:center; gap:4px; }
+    .vd-log-time { font-size:11px; color:var(--text-dim); flex-shrink:0; }
+    .vd-log-empty { text-align:center; padding:16px; color:var(--text-dim); font-size:12px; }
+
+    /* Progress bar in modal */
+    .vd-prog-bar-wrap { margin-top:10px; }
+    .vd-prog-track { height:8px; background:var(--accent-border-dim); border-radius:4px; overflow:hidden; }
+    .vd-prog-bar   { height:100%; border-radius:4px; transition:width 0.6s ease; }
+    .vd-prog-meta  { display:flex; justify-content:space-between; font-size:11px; color:var(--text-secondary); margin-top:5px; }
+
+    /* Card clickable */
+    .prod-card { cursor:pointer; }
+    .prod-card .act-btn, .prod-card .sbt { position:relative; z-index:2; }
+
+    /* Click hint bar */
+    .pc-click-hint {
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      padding:7px 16px;
+      font-size:11px; font-weight:600; color:var(--accent-light);
+      background:var(--accent-dim);
+      border-top:1px solid var(--accent-border-dim);
+      opacity:0; transition:opacity 0.2s;
+      pointer-events:none;
+      letter-spacing:0.3px;
+    }
+    .prod-card:hover .pc-click-hint { opacity:1; }
+    .prod-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.12); border-color:var(--accent-border); }
+    [data-theme="light"] .pc-click-hint { background:#f0fdf9; color:#0d9488; }
+    [data-theme="light"] .prod-card:hover { border-color:var(--accent); }
     .modal-title { font-size:15px; font-weight:700; color:var(--text-primary); display:flex; align-items:center; gap:9px; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid var(--accent-border-dim); }
     .modal-title i { color:var(--accent); font-size:18px; }
     .modal-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
@@ -190,6 +244,32 @@
     select option[value="ด่วน"] { color:#f87171; } select option[value="ปกติ"] { color:#fbbf24; }
     select option[value="รอดำเนินการ"] { color:#60a5fa; } select option[value="กำลังทำ"] { color:#fbbf24; }
     select option[value="สำเร็จ"] { color:#4ade80; } select option[value="ยกเลิก"] { color:#f87171; }
+
+    /* QR Modal */
+    .qr-modal { width:340px; text-align:center; }
+    .qr-box {
+      display:inline-flex; align-items:center; justify-content:center;
+      background:#fff; border-radius:16px; padding:18px;
+      margin:8px 0 16px; box-shadow:0 4px 20px rgba(0,0,0,0.15);
+    }
+    .qr-box canvas, .qr-box img { border-radius:4px; }
+    .qr-job-name { font-size:15px; font-weight:700; color:var(--text-primary); margin-bottom:4px; }
+    .qr-step-badge {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:5px 14px; border-radius:20px; font-size:12px; font-weight:700;
+      background:var(--accent-dim); color:var(--accent-light);
+      border:1px solid var(--accent-border); margin-bottom:14px;
+    }
+    .qr-hint { font-size:11px; color:var(--text-dim); margin-bottom:4px; }
+    .qr-url  { font-size:10px; color:var(--text-dim); word-break:break-all; background:var(--input); border-radius:6px; padding:6px 10px; margin-bottom:4px; }
+    .btn-qr {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:7px 14px; border-radius:8px; font-size:12px; font-weight:600;
+      background:var(--accent-dim); color:var(--accent-light);
+      border:1px solid var(--accent-border); cursor:pointer; transition:all 0.15s;
+    }
+    .btn-qr:hover { background:var(--accent); color:#fff; }
+    [data-theme="light"] .qr-box { box-shadow:0 4px 20px rgba(0,0,0,0.12); }
   </style>
 </head>
 <body>
@@ -212,7 +292,7 @@
       <div class="menu-item" id="sidebar-btn-add" data-tooltip="เพิ่มงานใหม่" onclick="location.href='addwork.html'" style="display:none">
         <i class="ti ti-plus"></i><span class="menu-label">เพิ่มงาน</span>
       </div>
-      <div class="menu-label-group">ผู้ดูแล</div>
+      <div class="menu-label-group admin-label">ผู้ดูแล</div>
       <div class="menu-item admin-item" data-tooltip="จัดการ User" onclick="location.href='users.html'">
         <i class="ti ti-users"></i><span class="menu-label">จัดการผู้ใช้งาน</span>
       </div>
@@ -292,6 +372,15 @@
           <option value="ด่วน">🔴 ด่วน</option>
           <option value="ปกติ">🟡 ปกติ</option>
         </select>
+        <select class="prod-sel" id="prod-step-filter" onchange="renderCards()">
+          <option value="">ขั้นตอนทั้งหมด</option>
+          <option value="ตัด">✂️ ตัด</option>
+          <option value="เจียร">⭕ เจียร</option>
+          <option value="CNC">⚙️ CNC</option>
+          <option value="QC">✅ QC</option>
+          <option value="Coding">💻 Coding</option>
+          <option value="เสร็จสิ้น">🏁 เสร็จสิ้น</option>
+        </select>
         <select class="prod-sel" id="prod-sort" onchange="renderCards()">
           <option value="default">เรียง: ค่าเริ่มต้น</option>
           <option value="duedate">เรียง: วันกำหนดส่ง</option>
@@ -310,6 +399,82 @@
     </div>
   </div>
 
+  <!-- MODAL: VIEW DETAIL -->
+  <div class="modal-bg" id="modal-view">
+    <div class="modal modal-view">
+      <div class="modal-title">
+        <i class="ti ti-eye"></i>
+        <span id="vd-modal-title">รายละเอียดงาน</span>
+        <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+          <span class="badge" id="vd-badge-priority"></span>
+          <span class="badge" id="vd-badge-status"></span>
+        </div>
+      </div>
+
+      <!-- Section: ข้อมูลงาน -->
+      <div class="vd-section">
+        <div class="vd-section-title"><i class="ti ti-info-circle"></i>ข้อมูลงาน</div>
+        <div class="vd-grid-3">
+          <div class="vd-item"><div class="vd-label">รหัสสินค้า</div><div class="vd-value" id="vd-ref">—</div></div>
+          <div class="vd-item"><div class="vd-label">Ref ลูกค้า</div><div class="vd-value" id="vd-refcus">—</div></div>
+          <div class="vd-item"><div class="vd-label">จำนวน</div><div class="vd-value" id="vd-qty">—</div></div>
+        </div>
+        <div class="vd-grid" style="margin-top:10px">
+          <div class="vd-item"><div class="vd-label">วันที่เพิ่ม</div><div class="vd-value" id="vd-startdate">—</div></div>
+          <div class="vd-item"><div class="vd-label">กำหนดส่ง</div><div class="vd-value" id="vd-duedate">—</div></div>
+        </div>
+        <div style="margin-top:10px">
+          <div class="vd-label" style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Remark</div>
+          <div class="vd-remark" id="vd-remark">—</div>
+        </div>
+      </div>
+
+      <!-- Section: ความคืบหน้า -->
+      <div class="vd-section">
+        <div class="vd-section-title"><i class="ti ti-route"></i>ขั้นตอนการผลิต</div>
+        <div class="vd-pipeline" id="vd-pipeline"></div>
+        <div class="vd-prog-bar-wrap">
+          <div class="vd-prog-track"><div class="vd-prog-bar" id="vd-prog-bar" style="width:0%"></div></div>
+          <div class="vd-prog-meta">
+            <span id="vd-step-label">—</span>
+            <span id="vd-pct">0%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: ประวัติขั้นตอน -->
+      <div class="vd-section">
+        <div class="vd-section-title"><i class="ti ti-history"></i>ประวัติขั้นตอน</div>
+        <div id="vd-log-list" class="vd-log-list">
+          <div class="vd-log-empty"><i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> กำลังโหลด...</div>
+        </div>
+      </div>
+
+      <div class="modal-btns">
+        <button class="btn-f btn-gray" onclick="closeModal('modal-view')"><i class="ti ti-x"></i>ปิด</button>
+        <button class="btn-f btn-green" onclick="openQR()"><i class="ti ti-qrcode"></i>QR Code</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: QR CODE -->
+  <div class="modal-bg" id="modal-qr">
+    <div class="modal qr-modal">
+      <div class="modal-title" style="justify-content:center;border-bottom:none;margin-bottom:4px;padding-bottom:0">
+        <i class="ti ti-qrcode"></i><span>QR Code งาน</span>
+      </div>
+      <div class="qr-job-name" id="qr-job-name">—</div>
+      <div class="qr-step-badge" id="qr-step-badge"><i class="ti ti-route" style="font-size:12px"></i><span id="qr-step-text">—</span></div>
+      <div class="qr-box"><div id="qr-canvas"></div></div>
+      <div class="qr-hint">สแกนเพื่อดูสถานะงาน</div>
+      <div class="qr-url" id="qr-url-text"></div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button class="btn-qr" onclick="downloadQR()"><i class="ti ti-download" style="font-size:13px"></i>บันทึกรูป</button>
+        <button class="btn-f btn-gray" onclick="closeModal('modal-qr')"><i class="ti ti-x"></i>ปิด</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: EDIT -->
   <div class="modal-bg" id="modal-edit">
     <div class="modal">
@@ -318,7 +483,6 @@
         <div class="modal-field"><label><i class="ti ti-hash"></i>รหัสสินค้า</label><input type="text" id="e-ref" /></div>
         <div class="modal-field"><label><i class="ti ti-file-text"></i>ชื่องาน <span style="color:#f87171">*</span></label><input type="text" id="e-title" /></div>
       </div>
-      <div class="modal-field"><label><i class="ti ti-tag"></i>Ref ลูกค้า</label><input type="text" id="e-refcus" /></div>
       <div class="modal-grid-3">
         <div class="modal-field"><label><i class="ti ti-refresh"></i>สถานะ</label>
           <select id="e-status">
@@ -334,7 +498,7 @@
         <div class="modal-field"><label><i class="ti ti-stack"></i>จำนวน</label><input type="number" id="e-qty" min="0" /></div>
       </div>
       <div class="modal-grid-2">
-        <div class="modal-field"><label><i class="ti ti-calendar-plus"></i>วันที่เพิ่ม</label><input type="date" id="e-startdate" /></div>
+        <div class="modal-field"><label><i class="ti ti-calendar-plus"></i>วันที่เพิ่ม</label><input type="text" id="e-startdate" readonly style="background:var(--input);opacity:0.7;cursor:default" /></div>
         <div class="modal-field"><label><i class="ti ti-calendar-due"></i>กำหนดส่ง</label><input type="date" id="e-duedate" /></div>
       </div>
       <div class="modal-field"><label><i class="ti ti-message-2"></i>Remark</label><textarea id="e-remark" rows="3"></textarea></div>
@@ -346,11 +510,12 @@
   </div>
 
   <div id="toast-container"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="theme.js"></script>
   <script>
     authGuard('view');
 
-    let allData = [], editId = null;
+    let allData = [], allHistory = [], editId = null, currentEditData = null;
     const CAN_EDIT   = hasPerm('edit');
     const CAN_DELETE = hasPerm('delete');
     const CAN_ADD    = hasPerm('add');
@@ -376,13 +541,31 @@
       return d.toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric', timeZone:'Asia/Bangkok' });
     }
 
+    function formatDatetime(raw) {
+      if (!raw || raw === '—') return '—';
+      if (/^\d{2}\/\d{2}\/\d{4}/.test(raw)) return raw;
+      // ลบ "น." ออกก่อน parse เช่น "2026-06-03 14:54น."
+      const cleaned = String(raw).replace('น.', '').trim();
+      const d = new Date(cleaned);
+      if (isNaN(d)) return raw;
+      const datePart = d.toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric', timeZone:'Asia/Bangkok' });
+      const hh  = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      return `${datePart} ${hh}:${min}`;
+    }
+
     // ── LOAD ─────────────────────────────────────────
     async function loadData(manual=false) {
       setRtStatus('syncing');
       try {
-        const res = await apiCall({ action:'getData' });
+        // โหลด getData + getHistoryLog พร้อมกัน
+        const [res, resH] = await Promise.all([
+          apiCall({ action:'getData' }),
+          apiCall({ action:'getHistoryLog' })
+        ]);
         if (res.success) {
-          allData = res.data || [];
+          allData    = res.data   || [];
+          allHistory = resH.success ? (resH.data || []) : [];
           updateSummary(); renderCards();
           setRtStatus('live');
           document.getElementById('last-updated').textContent = 'อัปเดต ' + new Date().toLocaleTimeString('th-TH');
@@ -412,14 +595,16 @@
       const q      = (document.getElementById('prod-search').value || '').toLowerCase();
       const stF    = document.getElementById('prod-status-filter').value;
       const prioF  = document.getElementById('prod-prio-filter').value;
+      const stepF  = document.getElementById('prod-step-filter') ? document.getElementById('prod-step-filter').value : '';
       const sortBy = document.getElementById('prod-sort').value;
       const grid   = document.getElementById('prod-grid');
 
       let list = allData.filter(d => {
-        const mS = !stF  || d.status   === stF;
-        const mP = !prioF|| d.priority === prioF;
-        const mQ = !q    || [d.ref,d.title].some(v=>String(v||'').toLowerCase().includes(q));
-        return mS && mP && mQ;
+        const mS    = !stF   || d.status   === stF;
+        const mP    = !prioF || d.priority === prioF;
+        const mStep = !stepF || d.step     === stepF;
+        const mQ    = !q     || [d.ref, d.title, d.step].some(v => String(v||'').toLowerCase().includes(q));
+        return mS && mP && mStep && mQ;
       });
 
       if (sortBy === 'duedate')  list.sort((a,b) => (a.duedate||'') < (b.duedate||'') ? -1 : 1);
@@ -474,7 +659,7 @@
           <span class="sbt sbt-cancel  ${d.status==='ยกเลิก'?'active':''}"  onclick="quickStatus('${d.id}','ยกเลิก')"><i class="ti ti-x" style="font-size:10px"></i>ยกเลิก</span>
         </div>` : '';
 
-        return `<div class="prod-card status-${stNum}" style="animation-delay:${idx*30}ms">
+        return `<div class="prod-card status-${stNum}" style="animation-delay:${idx*30}ms" onclick="handleCardClick(event,'${d.id}')">
           <div class="pc-header">
             <div>
               <div class="pc-title">${d.title||'—'}</div>
@@ -486,7 +671,7 @@
             </div>
           </div>
 
-          <div class="pc-pipeline">${pipeline}</div>
+          <div class="pc-pipeline" onclick="event.stopPropagation()">${pipeline}</div>
 
           <div class="pc-progress">
             <div class="pc-prog-header">
@@ -498,17 +683,16 @@
             </div>
           </div>
 
-          ${sbts}
+          <div onclick="event.stopPropagation()">${sbts}</div>
 
           <div class="pc-info">
             <div class="pc-info-item"><i class="ti ti-calendar-due"></i><span class="${dueClass}">${dueFmt}</span></div>
             ${d.startdate ? `<div class="pc-info-item"><i class="ti ti-calendar-plus"></i><span>${formatThaiDate(d.startdate)}</span></div>` : ''}
           </div>
 
-          <div class="pc-footer">
+          <div class="pc-footer" onclick="event.stopPropagation()">
             <div class="pc-remark">${d.remark ? '💬 '+d.remark : ''}</div>
             <div class="pc-actions">
-              ${CAN_EDIT ? `<button class="act-btn" onclick="openEdit('${d.id}')" title="แก้ไข"><i class="ti ti-edit"></i></button>` : ''}
             </div>
           </div>
           <div class="step-log">
@@ -517,6 +701,9 @@
               <div class="step-log-empty">กำลังโหลด...</div>
             </div>
           </div>
+          <div class="pc-click-hint">
+            <i class="ti ti-eye" style="font-size:12px"></i> คลิกเพื่อดูรายละเอียด
+          </div>
         </div>`;
       }).join('');
       // โหลด log ของทุก card
@@ -524,41 +711,56 @@
     }
 
     async function loadStepLogs(list) {
-      await Promise.all(list.map(async d => {
-        const el = document.getElementById('log-' + d.id);
-        if (!el) return;
-        try {
-          const res = await apiCall({ action:'getProductionLog', ref:d.ref||'', title:d.title||'' });
-          if (res.success && res.data.length) {
-            el.innerHTML = res.data.map(log => `
+      try {
+        // ใช้ allHistory ที่โหลดมาแล้ว ไม่ต้อง call API ใหม่
+        const res = { success: true, data: allHistory };
+        if (!res.success || !res.data) return;
+        const HIST_STEPS = [
+          { key:'s1', label:'ตัด' }, { key:'s2', label:'เจียร' },
+          { key:'s3', label:'CNC' }, { key:'s4', label:'QC' },
+          { key:'s5', label:'Coding' }, { key:'s6', label:'เสร็จสิ้น' },
+        ];
+        list.forEach(d => {
+          const el = document.getElementById('log-' + d.id);
+          if (!el) return;
+          const row = res.data.find(r =>
+            (d.ref   && String(r.ref   || '').trim() === String(d.ref   || '').trim()) ||
+            (d.title && String(r.title || '').trim() === String(d.title || '').trim())
+          );
+          if (row) {
+            const items = HIST_STEPS.filter(s => row[s.key]).map(s => `
               <div class="step-log-item">
                 <div class="step-log-dot"></div>
-                <div class="step-log-step">${log.step||'—'}</div>
-                <div class="step-log-by"><i class="ti ti-user" style="font-size:10px"></i> ${log.updatedBy||'—'}</div>
-                <div class="step-log-time">${log.updatedAt||log.time||'—'}</div>
+                <div class="step-log-step">${s.label}</div>
+                <div class="step-log-by"><i class="ti ti-user" style="font-size:10px"></i> ${row[s.key+'by']||'—'}</div>
+                <div class="step-log-time">${formatDatetime(row[s.key+'at'])}</div>
               </div>`).join('');
+            el.innerHTML = items || '<div class="step-log-empty">ยังไม่มีประวัติ</div>';
 
-            const doneSteps = new Set(res.data.map(l => l.step));
+            const doneKeys  = new Set(HIST_STEPS.filter(s => row[s.key]).map(s => s.label));
             const curStep   = d.step || '';
             const card      = el.closest('.prod-card');
             if (card) {
-              card.querySelectorAll('.pipe-step').forEach(dot => {
-                const label  = dot.querySelector('.pipe-label')?.textContent?.trim();
+              card.querySelectorAll('.pipe-step').forEach((dot, i) => {
                 const keyMap = { 'ตัด':'ตัด','เจียร':'เจียร','CNC':'CNC','QC':'QC','Coding':'Coding','เสร็จ':'เสร็จสิ้น' };
+                const label  = dot.querySelector('.pipe-label')?.textContent?.trim();
                 const key    = keyMap[label] || label;
                 dot.classList.remove('done','active','cancel');
-                if (d.status === 'ยกเลิก')   dot.classList.add('cancel');
-                else if (key === curStep)     dot.classList.add('active');
-                else if (doneSteps.has(key))  dot.classList.add('done');
+                if (d.status === 'ยกเลิก') dot.classList.add('cancel');
+                else if (key === curStep)   dot.classList.add('active');
+                else if (doneKeys.has(key)) dot.classList.add('done');
               });
             }
           } else {
             el.innerHTML = '<div class="step-log-empty">ยังไม่มีประวัติ</div>';
           }
-        } catch(e) {
-          el.innerHTML = '<div class="step-log-empty">โหลดไม่สำเร็จ</div>';
-        }
-      }));
+        });
+      } catch(e) {
+        list.forEach(d => {
+          const el = document.getElementById('log-' + d.id);
+          if (el) el.innerHTML = '<div class="step-log-empty">โหลดไม่สำเร็จ</div>';
+        });
+      }
     }
 
     // ── QUICK STEP (เปลี่ยนขั้นตอนการผลิต) ──────────────────────
@@ -566,24 +768,51 @@
       const d = allData.find(x => x.id === id);
       if (!d || d.step === newStep) return;
       if (!hasPerm('edit')) { showToast('ไม่มีสิทธิ์แก้ไข','error'); return; }
-      const oldStep = d.step;
+      const oldStep = d.step, oldStatus = d.status;
+      const updatedBy = sessionStorage.getItem('displayName') || sessionStorage.getItem('username') || '';
+      const nowStr = new Date().toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric', timeZone:'Asia/Bangkok' })
+                   + ' ' + new Date().toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit', timeZone:'Asia/Bangkok' });
+
+      // Optimistic update allData ทันที
       d.step = newStep;
       if (d.status === 'รอดำเนินการ') d.status = 'กำลังทำ';
       if (newStep === 'เสร็จสิ้น') d.status = 'สำเร็จ';
+
+      // Optimistic update allHistory ทันที
+      const STEP_KEY = { 'ตัด':'s1','เจียร':'s2','CNC':'s3','QC':'s4','Coding':'s5','เสร็จสิ้น':'s6' };
+      const sk = STEP_KEY[newStep];
+      if (sk) {
+        let row = allHistory.find(r => String(r.ref||'').trim() === String(d.ref||'').trim()
+                                    || String(r.title||'').trim() === String(d.title||'').trim());
+        if (!row) {
+          row = { ref:d.ref||'', title:d.title||'' };
+          allHistory.push(row);
+        }
+        row[sk]       = newStep;
+        row[sk+'by']  = updatedBy;
+        row[sk+'at']  = nowStr;
+      }
+
       updateSummary(); renderCards();
       try {
-        const res = await apiCall({ action:'updateStep', id, step:newStep });
+        // ยิง API ทั้ง 3 พร้อมกันเลย ไม่รอทีละอัน
+        const [res] = await Promise.all([
+          apiCall({ action:'updateStep', id, step:newStep }),
+          apiCall({ action:'editData', id, title:d.title||'', ref:d.ref||'', qty:d.qty||'', priority:d.priority||'', status:d.status, startdate:d.startdate||'', duedate:d.duedate||'', remark:d.remark||'' }),
+          apiCall({ action:'logProduction', id, title:d.title||'', ref:d.ref||'', step:newStep, updatedBy })
+        ]);
         if (res.success) {
-          await apiCall({ action:'editData', id, title:d.title||'', ref:d.ref||'', qty:d.qty||'', priority:d.priority||'', status:d.status, startdate:d.startdate||'', duedate:d.duedate||'', remark:d.remark||'' });
-          const updatedBy = localStorage.getItem('displayName') || localStorage.getItem('username') || '';
-          apiCall({ action:'logProduction', id, title:d.title||'', ref:d.ref||'', step:newStep, updatedBy });
-          showToast(`อัปเดต: ${newStep}`, 'success', 1500);
-          stopRealtime(); await loadData();
+          showToast(`✅ ${newStep}`, 'success', 1200);
         } else {
-          d.step = oldStep; updateSummary(); renderCards();
+          d.step = oldStep; d.status = oldStatus;
+          updateSummary(); renderCards();
           showToast(res.message||'อัปเดตไม่สำเร็จ','error');
         }
-      } catch(e) { d.step = oldStep; updateSummary(); renderCards(); showToast('ไม่สามารถเชื่อมต่อได้','error'); }
+      } catch(e) {
+        d.step = oldStep; d.status = oldStatus;
+        updateSummary(); renderCards();
+        showToast('ไม่สามารถเชื่อมต่อได้','error');
+      }
     }
 
     // ── QUICK STATUS ─────────────────────────────────
@@ -598,7 +827,7 @@
           showToast('อัปเดตสถานะสำเร็จ','success',1500);
           // บันทึก Data2 เมื่อกดเริ่มผลิต
           if (newStatus === 'กำลังทำ') {
-            const updatedBy = localStorage.getItem('displayName') || localStorage.getItem('username') || '';
+            const updatedBy = sessionStorage.getItem('displayName') || sessionStorage.getItem('username') || '';
             apiCall({ action:'logProduction', id, title:d.title||'', ref:d.ref||'', updatedBy });
           }
         }
@@ -606,18 +835,181 @@
       } catch(e) { d.status=old; updateSummary(); renderCards(); showToast('ไม่สามารถเชื่อมต่อได้','error'); }
     }
 
+    // ── VIEW DETAIL MODAL ─────────────────────────────
+    let viewId = null;
+
+    function openView(id) {
+      const d = allData.find(x => x.id === id); if (!d) return;
+      viewId = id;
+
+      // Header
+      document.getElementById('vd-modal-title').textContent = d.title || '—';
+      const bPrio = document.getElementById('vd-badge-priority');
+      bPrio.textContent = d.priority || '—';
+      bPrio.className = 'badge ' + (d.priority === 'ด่วน' ? 'p-high' : 'p-mid');
+
+      const bSt = document.getElementById('vd-badge-status');
+      const stMap = { รอดำเนินการ:'s-pending', กำลังทำ:'s-process', สำเร็จ:'s-done', ยกเลิก:'s-fail' };
+      bSt.textContent = d.status || '—';
+      bSt.className = 'badge ' + (stMap[d.status] || '');
+
+      // Info fields
+      document.getElementById('vd-ref').textContent      = d.ref       || '—';
+      document.getElementById('vd-refcus').textContent   = d.refcus    || '—';
+      document.getElementById('vd-qty').textContent      = d.qty       || '—';
+      document.getElementById('vd-startdate').textContent= formatDatetime(d.startdate);
+      const dueEl = document.getElementById('vd-duedate');
+      dueEl.textContent = formatThaiDate(d.duedate);
+      if (d.duedate) {
+        const today = new Date(); today.setHours(0,0,0,0);
+        const diff = (new Date(d.duedate) - today) / 86400000;
+        dueEl.className = 'vd-value ' + (diff < 0 ? 'due-overdue' : diff <= 3 ? 'due-soon' : '');
+      } else { dueEl.className = 'vd-value'; }
+      document.getElementById('vd-remark').textContent   = d.remark    || '—';
+
+      // Pipeline
+      const isCan   = d.status === 'ยกเลิก';
+      const curStep = d.step || '';
+      const stIdx   = STEP_IDX[curStep] ?? -1;
+      const pct     = isCan ? 0 : (PROG_PCT[curStep] ?? 0);
+      const barColor= isCan ? '#64748b' : (PROG_COLOR[curStep] ?? '#64748b');
+
+      const pipelineEl = document.getElementById('vd-pipeline');
+      pipelineEl.innerHTML = STAGES.map((st, i) => {
+        let cls = '';
+        if (isCan)            cls = 'cancel';
+        else if (i === stIdx) cls = 'active';
+        return `<div class="pipe-step ${cls}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;position:relative">
+          <div class="pipe-dot" style="width:32px;height:32px;font-size:14px"><i class="ti ${st.icon}" style="font-size:13px"></i></div>
+          <div class="pipe-label">${st.label}</div>
+        </div>`;
+      }).join('<div style="flex:1;height:2px;background:var(--accent-border-dim);margin-top:16px;border-radius:2px"></div>');
+
+      document.getElementById('vd-prog-bar').style.cssText = `width:${pct}%;background:${barColor}`;
+      document.getElementById('vd-step-label').textContent = isCan ? 'ยกเลิก' : (curStep || 'ยังไม่เริ่ม');
+      document.getElementById('vd-pct').textContent = pct + '%';
+
+      // Log
+      const logEl = document.getElementById('vd-log-list');
+      logEl.innerHTML = '<div class="vd-log-empty"><i class="ti ti-loader" style="animation:spin 1s linear infinite;display:inline-block"></i> กำลังโหลด...</div>';
+
+      document.getElementById('modal-view').classList.add('show');
+
+      // Load log async — ใช้ getHistoryLog แล้ว filter เอาของงานนี้
+      const HIST_STEPS = [
+        { key:'s1', label:'ตัด' }, { key:'s2', label:'เจียร' },
+        { key:'s3', label:'CNC' }, { key:'s4', label:'QC' },
+        { key:'s5', label:'Coding' }, { key:'s6', label:'เสร็จสิ้น' },
+      ];
+      Promise.resolve({ success:true, data:allHistory }).then(res => {
+        if (res.success && res.data) {
+          // หา row ที่ตรงกับงานนี้ (match ref หรือ title)
+          const row = res.data.find(r =>
+            (d.ref   && String(r.ref   || '').trim() === String(d.ref   || '').trim()) ||
+            (d.title && String(r.title || '').trim() === String(d.title || '').trim())
+          );
+          if (row) {
+            // แปลง s1..s6 เป็น log items เฉพาะที่มีค่า
+            const items = HIST_STEPS
+              .filter(s => row[s.key])
+              .map((s, i) => `
+                <div class="vd-log-item">
+                  <div class="vd-log-num">${i + 1}</div>
+                  <div class="vd-log-step">${s.label}</div>
+                  <div class="vd-log-by"><i class="ti ti-user" style="font-size:11px;color:var(--text-dim)"></i>${row[s.key + 'by'] || '—'}</div>
+                  <div class="vd-log-time">${formatDatetime(row[s.key + 'at'])}</div>
+                </div>`).join('');
+            logEl.innerHTML = items || '<div class="vd-log-empty">ยังไม่มีประวัติขั้นตอน</div>';
+
+            // Update pipeline dots จาก history
+            const doneKeys = new Set(HIST_STEPS.filter(s => row[s.key]).map(s => s.label));
+            pipelineEl.querySelectorAll('.pipe-step').forEach((dot, i) => {
+              const label = STAGES[i]?.label;
+              dot.classList.remove('done','active','cancel');
+              if (isCan)                  dot.classList.add('cancel');
+              else if (STAGES[i]?.key === curStep) dot.classList.add('active');
+              else if (doneKeys.has(label)) dot.classList.add('done');
+            });
+          } else {
+            logEl.innerHTML = '<div class="vd-log-empty">ยังไม่มีประวัติขั้นตอน</div>';
+          }
+        } else {
+          logEl.innerHTML = '<div class="vd-log-empty">ยังไม่มีประวัติขั้นตอน</div>';
+        }
+      }).catch(() => {
+        logEl.innerHTML = '<div class="vd-log-empty" style="color:#f87171">โหลดไม่สำเร็จ</div>';
+      });
+    }
+
+    function handleCardClick(e, id) {
+      if (document.getElementById('modal-edit').classList.contains('show')) return;
+      if (e.target.closest('.act-btn, .sbt, .modal-bg, [data-no-view], .step-log-list')) return;
+      openView(id);
+    }
+
+    function openEditFromView() {
+      closeModal('modal-view');
+      if (viewId) openEdit(viewId);
+    }
+
+    // ── QR CODE ───────────────────────────────────────
+    let qrInstance = null;
+    function openQR() {
+      const d = allData.find(x => x.id === viewId); if (!d) return;
+
+      // ข้อมูลใน QR: URL ของหน้า production พร้อม filter ref
+      const base = window.location.href.split('?')[0];
+      const qrUrl = `${base}?ref=${encodeURIComponent(d.ref || d.title || d.id)}&view=${encodeURIComponent(d.id)}`;
+
+      document.getElementById('qr-job-name').textContent = d.title || '—';
+      const stepText = d.step || 'ยังไม่เริ่ม';
+      document.getElementById('qr-step-text').textContent = `ขั้นตอน: ${stepText}  •  ${d.status || '—'}`;
+      document.getElementById('qr-url-text').textContent  = qrUrl;
+
+      // สร้าง QR ใหม่ทุกครั้ง
+      const container = document.getElementById('qr-canvas');
+      container.innerHTML = '';
+      qrInstance = new QRCode(container, {
+        text: qrUrl,
+        width: 200, height: 200,
+        colorDark: '#0f172a', colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.M
+      });
+
+      document.getElementById('modal-qr').classList.add('show');
+    }
+
+    function downloadQR() {
+      const canvas = document.querySelector('#qr-canvas canvas');
+      const img    = document.querySelector('#qr-canvas img');
+      const jobName = document.getElementById('qr-job-name').textContent || 'qr';
+      const filename = `QR_${jobName.replace(/\s+/g,'_')}.png`;
+
+      if (canvas) {
+        const a = document.createElement('a');
+        a.href = canvas.toDataURL('image/png');
+        a.download = filename; a.click();
+      } else if (img) {
+        const a = document.createElement('a');
+        a.href = img.src; a.download = filename; a.click();
+      } else {
+        showToast('ไม่สามารถบันทึกได้','error');
+      }
+    }
+
     // ── EDIT MODAL ───────────────────────────────────
     function openEdit(id) {
       if (!hasPerm('edit')) { showToast('ไม่มีสิทธิ์แก้ไขข้อมูล','error'); return; }
       const d = allData.find(x => x.id===id); if(!d) return;
       editId = id;
+      currentEditData = d;
       document.getElementById('e-title').value     = d.title     || '';
       document.getElementById('e-ref').value       = d.ref       || '';
       document.getElementById('e-refcus').value    = d.refcus    || '';
       document.getElementById('e-qty').value       = d.qty       || '1';
       document.getElementById('e-priority').value  = d.priority  || 'ปกติ';
       document.getElementById('e-status').value    = d.status    || 'รอดำเนินการ';
-      document.getElementById('e-startdate').value = d.startdate || '';
+      document.getElementById('e-startdate').value = formatDatetime(d.startdate) || '';
       document.getElementById('e-duedate').value   = d.duedate   || '';
       document.getElementById('e-remark').value    = d.remark    || '';
       document.getElementById('modal-edit').classList.add('show');
@@ -630,7 +1022,7 @@
       btn.disabled = true;
       btn.innerHTML = '<span style="width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block"></span>';
       try {
-        const res = await apiCall({ action:'editData', id:editId, title, ref:document.getElementById('e-ref').value.trim(), refcus:document.getElementById('e-refcus').value.trim(), qty:document.getElementById('e-qty').value, priority:document.getElementById('e-priority').value, status:document.getElementById('e-status').value, startdate:document.getElementById('e-startdate').value, duedate:document.getElementById('e-duedate').value, remark:document.getElementById('e-remark').value.trim() });
+        const res = await apiCall({ action:'editData', id:editId, title, ref:document.getElementById('e-ref').value.trim(), refcus:'', qty:document.getElementById('e-qty').value, priority:document.getElementById('e-priority').value, status:document.getElementById('e-status').value, startdate:currentEditData?.startdate||'', duedate:document.getElementById('e-duedate').value, remark:document.getElementById('e-remark').value.trim() });
         if (res.success) { closeModal('modal-edit'); showToast('แก้ไขสำเร็จ','success'); stopRealtime(); await loadData(); }
         else showToast(res.message||'เกิดข้อผิดพลาด','error');
       } catch(e) { showToast('ไม่สามารถเชื่อมต่อได้','error'); }
@@ -641,11 +1033,11 @@
     document.querySelectorAll('.modal-bg').forEach(bg => bg.addEventListener('click', e => { if(e.target===bg) bg.classList.remove('show'); }));
 
     // ── REALTIME ─────────────────────────────────────
-    const RT_INTERVAL = 30; let rtTimer=null, rtCountdown=RT_INTERVAL;
+    const RT_INTERVAL = 60; let rtTimer=null, rtCountdown=RT_INTERVAL;
     function startRealtime() { stopRealtime(); rtCountdown=RT_INTERVAL; updateCountdown(); rtTimer=setInterval(()=>{ rtCountdown--; if(rtCountdown<=0){rtCountdown=RT_INTERVAL;silentRefresh();} updateCountdown(); },1000); }
     function stopRealtime()  { if(rtTimer){clearInterval(rtTimer);rtTimer=null;} }
     function updateCountdown() { const el=document.getElementById('rt-countdown'); if(!el) return; el.textContent='('+rtCountdown+'s)'; el.className='rt-countdown'+(rtCountdown<=5?' soon':''); }
-    async function silentRefresh() { try{ const res=await apiCall({action:'getData'}); if(res.success){allData=res.data||[];updateSummary();renderCards();setRtStatus('live');document.getElementById('last-updated').textContent='อัปเดต '+new Date().toLocaleTimeString('th-TH');}else setRtStatus('error'); }catch(e){setRtStatus('error');} }
+    async function silentRefresh() { try{ const [res,resH]=await Promise.all([apiCall({action:'getData'}),apiCall({action:'getHistoryLog'})]); if(res.success){allData=res.data||[];allHistory=resH.success?(resH.data||[]):[];updateSummary();renderCards();setRtStatus('live');document.getElementById('last-updated').textContent='อัปเดต '+new Date().toLocaleTimeString('th-TH');}else setRtStatus('error'); }catch(e){setRtStatus('error');} }
     function setRtStatus(state) {
       const dot=document.getElementById('rt-dot'); if(dot) dot.className='rt-dot'+(state==='syncing'?' syncing':state==='error'?' error':state==='paused'?' paused':'');
       const lbl=document.getElementById('rt-label'); if(lbl) lbl.textContent={live:'Live',syncing:'กำลังซิงค์...',error:'เชื่อมต่อไม่ได้',paused:'หยุดชั่วคราว'}[state]||state;

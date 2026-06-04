@@ -262,7 +262,7 @@
   <div class="corner bl"></div>
   <div class="corner br"></div>
   <div class="hud-label hud-tl">SYS // SECURE ACCESS</div>
-  <div class="hud-label hud-br">FAMOUS TOOLS v1.0.1</div>
+  <div class="hud-label hud-br">FAMOUS TOOLS v1.0.0</div>
 
   <div class="wrap">
     <div class="card" id="card">
@@ -400,7 +400,7 @@
     }
 
     // ── API CALL ──────────────────────────────────────────────────────────────
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzZtJWrIvdbfzodkM8RZlxoUO8-8J9AHKg0TlZrQw_B4-aX75qt_6vSAQA5o2SfLU5w/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyU3aHPX5OYHQnMnVa11ewP6sulAxY35ds5O5z6INNWjyfUVN74oIh54cIWKlAsQ9p0/exec';
 
     async function loginHandler() {
       const username = document.getElementById('username').value.trim();
@@ -441,11 +441,11 @@
         btn.classList.remove('loading');
 
         if (data.success) {
-          localStorage.setItem('token',       data.token);
-          localStorage.setItem('username',    data.username);
-          localStorage.setItem('role',        data.role);
-          localStorage.setItem('permissions', data.permissions || 'view');
-          localStorage.setItem('displayName', data.displayName || data.username);
+          sessionStorage.setItem('token',       data.token);
+          sessionStorage.setItem('username',    data.username);
+          sessionStorage.setItem('role',        data.role);
+          sessionStorage.setItem('permissions', data.permissions || 'view');
+          sessionStorage.setItem('displayName', data.displayName || data.username);
 
           // Success animation
           document.getElementById('success-name').textContent =
@@ -477,7 +477,7 @@
 
     document.addEventListener('keydown', e => { if (e.key === 'Enter') loginHandler(); });
 
-    if (localStorage.getItem('token')) {
+    if (sessionStorage.getItem('token')) {
       window.location.href = 'dashboard1.html';
     }
   </script>

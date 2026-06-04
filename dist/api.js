@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-export const API_URL = "https://script.google.com/macros/s/AKfycbzZtJWrIvdbfzodkM8RZlxoUO8-8J9AHKg0TlZrQw_B4-aX75qt_6vSAQA5o2SfLU5w/exec";
+export const API_URL = "https://script.google.com/macros/s/AKfycbyU3aHPX5OYHQnMnVa11ewP6sulAxY35ds5O5z6INNWjyfUVN74oIh54cIWKlAsQ9p0/exec";
 export function apiCall(params) {
     return __awaiter(this, void 0, void 0, function* () {
         const query = new URLSearchParams(params).toString();

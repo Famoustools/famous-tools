@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+  <style id="admin-hide">.admin-item{display:none!important}.admin-item::after{content:none!important}.admin-label{display:none!important}</style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Famous Tools - Dashboard</title>
@@ -544,7 +545,7 @@
       <div class="menu-item" id="sidebar-btn-add" data-tooltip="เพิ่มงานใหม่" onclick="location.href='addwork.html'" style="display:none">
         <i class="ti ti-plus"></i><span class="menu-label">เพิ่มงาน</span>
       </div>
-      <div class="menu-label-group">ผู้ดูแล</div>
+      <div class="menu-label-group admin-label">ผู้ดูแล</div>
       <div class="menu-item admin-item" data-tooltip="จัดการ User" onclick="location.href='users.html'">
         <i class="ti ti-users"></i><span class="menu-label">จัดการผู้ใช้งาน</span>
       </div>
@@ -892,7 +893,9 @@
       </div>
       <div class="modal-btns" style="margin-top:24px">
         <button class="btn-f btn-gray" onclick="closeModal('modal-delete')"><i class="ti ti-x"></i>ยกเลิก</button>
-        <button class="btn-f btn-red" id="btn-confirm-del" onclick="confirmDelete()"><i class="ti ti-trash"></i>ลบ</button>
+        <button class="btn-f btn-red" id="btn-confirm-del" onclick="confirmDelete()" disabled style="opacity:0.5;cursor:not-allowed">
+          <i class="ti ti-trash"></i>ลบ <span id="del-countdown">(3)</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1341,30 +1344,60 @@
     }
 
     // ── DELETE ────────────────────────────────────────────
+    let delCountdownTimer = null;
+
     function askDelete(id, name) {
       if (!hasPerm('delete')) { showToast('ไม่มีสิทธิ์ลบข้อมูล','error'); return; }
       deleteId = id;
       document.getElementById('del-name').textContent = name;
+
+      const btn = document.getElementById('btn-confirm-del');
+      const cd  = document.getElementById('del-countdown');
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.style.cursor  = 'not-allowed';
+      cd.textContent = '(3)';
+
       openModal('modal-delete');
+
+      let count = 3;
+      if (delCountdownTimer) clearInterval(delCountdownTimer);
+      delCountdownTimer = setInterval(() => {
+        count--;
+        if (count <= 0) {
+          clearInterval(delCountdownTimer);
+          cd.textContent = '';
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btn.style.cursor  = 'pointer';
+        } else {
+          cd.textContent = `(${count})`;
+        }
+      }, 1000);
     }
 
     async function confirmDelete() {
       const btn = document.getElementById('btn-confirm-del');
       btn.disabled = true;
+      btn.innerHTML = '<span style="width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle"></span> กำลังลบ...';
       try {
         const res = await apiCall({ action: 'deleteData', id: deleteId });
         if (res.success) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="ti ti-trash"></i> ลบ <span id="del-countdown"></span>';
           closeModal('modal-delete');
           showToast('ลบข้อมูลสำเร็จ', 'success');
           stopRealtime();
           await loadData();
         } else {
           showToast(res.message || 'ลบไม่สำเร็จ', 'error');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="ti ti-trash"></i> ลบ <span id="del-countdown"></span>';
         }
       } catch(e) {
         showToast('ไม่สามารถเชื่อมต่อได้', 'error');
-      } finally {
         btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-trash"></i> ลบ <span id="del-countdown"></span>';
       }
     }
 
@@ -1384,7 +1417,12 @@
 
     // ── MODAL HELPERS ─────────────────────────────────────
     function openModal(id) { document.getElementById(id).classList.add('show'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+      if (id === 'modal-delete') {
+        if (delCountdownTimer) { clearInterval(delCountdownTimer); delCountdownTimer = null; }
+      }
+    }
     document.querySelectorAll('.modal-bg').forEach(bg => {
       bg.addEventListener('click', e => { if (e.target === bg) bg.classList.remove('show'); });
     });

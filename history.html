@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+  <style id="admin-hide">.admin-item{display:none!important}.admin-item::after{content:none!important}.admin-label{display:none!important}</style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Famous Tools - ประวัติขั้นตอน</title>
@@ -147,7 +148,7 @@
       <div class="menu-item" data-tooltip="จัดการงาน" onclick="location.href='manage.html'"><i class="ti ti-list-check"></i><span class="menu-label">จัดการงาน</span></div>
       <div class="menu-item" data-tooltip="กระบวนการผลิต" onclick="location.href='production.html'"><i class="ti ti-route"></i><span class="menu-label">กระบวนการผลิต</span></div>
       <div class="menu-item" data-tooltip="เพิ่มงานใหม่" onclick="location.href='addwork.html'"><i class="ti ti-plus"></i><span class="menu-label">เพิ่มงาน</span></div>
-      <div class="menu-label-group">ผู้ดูแล</div>
+      <div class="menu-label-group admin-label">ผู้ดูแล</div>
       <div class="menu-item admin-item" data-tooltip="จัดการ User" onclick="location.href='users.html'"><i class="ti ti-users"></i><span class="menu-label">จัดการผู้ใช้งาน</span></div>
       <div class="menu-item admin-item" data-tooltip="ประวัติ Login" onclick="location.href='logs.html'"><i class="ti ti-activity"></i><span class="menu-label">ประวัติเข้าระบบ</span></div>
       <div class="menu-item admin-item active" data-tooltip="ประวัติขั้นตอน"><i class="ti ti-clipboard-list"></i><span class="menu-label">ประวัติขั้นตอน</span></div>
@@ -228,6 +229,21 @@
     authGuard('manage_user');
     let allRows=[], filtered=[];
 
+    function formatDatetime(raw) {
+      if (!raw || raw === '—') return '—';
+      if (/^\d{2}\/\d{2}\/\d{4}/.test(raw)) return raw;
+      const cleaned = String(raw).replace('น.', '').trim();
+      const d = new Date(cleaned);
+      if (isNaN(d)) return raw;
+      const dd   = String(d.getDate()).padStart(2, '0');
+      const mm   = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      const hh   = String(d.getHours()).padStart(2, '0');
+      const min  = String(d.getMinutes()).padStart(2, '0');
+      const ss   = String(d.getSeconds()).padStart(2, '0');
+      return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+    }
+
     const STEPS = [
       { key:'s1', label:'ตัด',       cls:'ตัด',    dot:'sd-ตัด',    si:'si-ตัด',    sb:'sb-ตัด' },
       { key:'s2', label:'เจียร',     cls:'เจียร',  dot:'sd-เจียร',  si:'si-เจียร',  sb:'sb-เจียร' },
@@ -279,7 +295,7 @@
                 <div class="step-name-label">${s.label}</div>
               </div>
               <div class="step-by-row"><i class="ti ti-user" style="font-size:10px;opacity:0.5"></i>${r[s.key+'by']||'—'}</div>
-              <div class="step-at-row">${r[s.key+'at']||'—'}</div>
+              <div class="step-at-row">${formatDatetime(r[s.key+'at'])}</div>
             </div>
             ${si<arr.length-1?'<div class="step-arrow"><i class="ti ti-chevron-right"></i></div>':''}
           </div>`).join('');
@@ -292,7 +308,7 @@
           <td>${r.title||'—'}</td>
           <td><span class="${sCls}">${r.status||'—'}</span></td>
           <td style="font-size:12px;color:var(--text-secondary)">${dateStr}</td>
-          <td style="font-size:12px;color:var(--text-dim)">${r.timeStart||'—'}</td>
+          <td style="font-size:12px;color:var(--text-dim)">${formatDatetime(r.timeStart)}</td>
           <td style="text-align:right">
             <span>${badges||'<span style="color:var(--text-dim);font-size:11px">ยังไม่มี</span>'}</span>
             <button class="expand-btn" onclick="toggleDetail(${i})" id="btn-${i}" style="margin-left:8px">

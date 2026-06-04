@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
+  <style id="admin-hide">.admin-item{display:none!important}.admin-item::after{content:none!important}.admin-label{display:none!important}</style>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Famous Tools - จัดการผู้ใช้งาน</title>
@@ -54,13 +55,16 @@
       <div class="menu-item" data-tooltip="เพิ่มงานใหม่" onclick="location.href='addwork.html'">
         <i class="ti ti-plus"></i><span class="menu-label">เพิ่มงาน</span>
       </div>
-      <div class="menu-label-group">ผู้ดูแล</div>
+      <div class="menu-label-group admin-label">ผู้ดูแล</div>
       <div class="menu-item admin-item active" data-tooltip="จัดการ User" onclick="location.href='users.html'">
         <i class="ti ti-users"></i><span class="menu-label">จัดการผู้ใช้งาน</span>
       </div>
 
       <div class="menu-item admin-item " data-tooltip="ประวัติ Login" onclick="location.href='logs.html'">
         <i class="ti ti-activity"></i><span class="menu-label">ประวัติเข้าระบบ</span>
+      </div>
+      <div class="menu-item admin-item" data-tooltip="ประวัติขั้นตอน" onclick="location.href='history.html'">
+        <i class="ti ti-clipboard-list"></i><span class="menu-label">ประวัติขั้นตอน</span>
       </div>
     </div>
       <div class="sidebar-footer">
@@ -229,6 +233,21 @@
   <script>
     authGuard('manage_user');
 
+    function formatDatetime(raw) {
+      if (!raw || raw === '—') return '—';
+      if (/^\d{2}\/\d{2}\/\d{4}/.test(raw)) return raw;
+      const cleaned = String(raw).replace('น.', '').trim();
+      const d = new Date(cleaned);
+      if (isNaN(d)) return raw;
+      const dd   = String(d.getDate()).padStart(2, '0');
+      const mm   = String(d.getMonth() + 1).padStart(2, '0');
+      const yyyy = d.getFullYear();
+      const hh   = String(d.getHours()).padStart(2, '0');
+      const min  = String(d.getMinutes()).padStart(2, '0');
+      const ss   = String(d.getSeconds()).padStart(2, '0');
+      return `${dd}/${mm}/${yyyy} ${hh}:${min}:${ss}`;
+    }
+
     let allUsers  = [];
     let allRoles  = [];
     let editUsername = null;
@@ -346,7 +365,7 @@
           </td>
           <td style="color:var(--text-primary)">${u.displayName || '—'}</td>
           <td><div style="display:flex;flex-wrap:wrap;gap:3px">${permBadges || '<span style="color:var(--text-dim);font-size:12px">ไม่มีสิทธิ์</span>'}</div></td>
-          <td style="font-size:12px">${u.createdAt || '—'}</td>
+          <td style="font-size:12px">${formatDatetime(u.createdAt)}</td>
           <td>
             <button class="act-btn" onclick="openEdit('${u.username}')" title="แก้ไข"><i class="ti ti-edit"></i></button>
             ${!isSelf ? `<button class="act-btn danger" onclick="askDel('${u.username}')" title="ลบ"><i class="ti ti-trash"></i></button>` : ''}
@@ -423,6 +442,7 @@
       const permStr = perms.join(',');
       const btn = document.getElementById('btn-save-user');
       btn.disabled = true;
+      btn.innerHTML = '<span style="width:13px;height:13px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;vertical-align:middle"></span> กำลังบันทึก...';
       try {
         const params = editUsername
           ? { action:'editUser', username:editUsername, displayName:displayname, permissions:permStr, password }
@@ -439,6 +459,7 @@
         showToast('ไม่สามารถเชื่อมต่อได้','error');
       } finally {
         btn.disabled = false;
+        btn.innerHTML = '<i class="ti ti-check"></i> บันทึก';
       }
     }
 

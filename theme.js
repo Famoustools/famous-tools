@@ -1,17 +1,14 @@
-// ── ANTI-FLASH: inject style ทันทีก่อน DOM render ──────
+// ── ANTI-FLASH ──────────────────────────────────────────
+// HTML ทุกหน้าฝัง <style id="admin-hide"> ซ่อน admin-item ไว้แล้ว
+// JS แค่ลบ style นั้นออกถ้า user มีสิทธิ์ manage_user
 (function() {
-  const raw  = localStorage.getItem('permissions') || 'view';
+  const raw  = sessionStorage.getItem('permissions') || 'view';
   const perms = raw === 'all'
     ? ['view','add','edit','delete','manage_user','export']
     : raw.split(',').map(x => x.trim());
-  const canManage = perms.includes('manage_user');
-
-  if (!canManage) {
-    // inject style ซ่อน admin items ก่อนที่เบราว์เซอร์จะ render HTML
-    const s = document.createElement('style');
-    s.id = 'anti-flash-style';
-    s.textContent = '.admin-item{display:none!important}.menu-label-group{display:none!important}';
-    document.head.appendChild(s);
+  if (perms.includes('manage_user')) {
+    const el = document.getElementById('admin-hide');
+    if (el) el.remove();
   }
 })();
 
@@ -21,7 +18,7 @@
 // ═══════════════════════════════════════════════════════
 
 // ── API ────────────────────────────────────────────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbzZtJWrIvdbfzodkM8RZlxoUO8-8J9AHKg0TlZrQw_B4-aX75qt_6vSAQA5o2SfLU5w/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbyU3aHPX5OYHQnMnVa11ewP6sulAxY35ds5O5z6INNWjyfUVN74oIh54cIWKlAsQ9p0/exec';
 
 function apiCall(params, timeoutMs = 12000) {
   return new Promise((resolve, reject) => {
@@ -105,7 +102,7 @@ function showToast(message, type = 'info', duration = 3000) {
 
 // ── AUTH GUARD ─────────────────────────────────────────
 function authGuard(requiredPerm) {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   if (!token) { window.location.href = 'index.html'; return false; }
   if (requiredPerm && !hasPerm(requiredPerm)) {
     showToast('คุณไม่มีสิทธิ์เข้าถึงหน้านี้', 'error');
@@ -117,7 +114,7 @@ function authGuard(requiredPerm) {
 
 // ── PERMISSIONS ────────────────────────────────────────
 function hasPerm(p) {
-  const raw = localStorage.getItem('permissions') || 'view';
+  const raw = sessionStorage.getItem('permissions') || 'view';
   const perms = raw === 'all'
     ? ['view','add','edit','delete','manage_user','export']
     : raw.split(',').map(x => x.trim());
@@ -127,21 +124,25 @@ function hasPerm(p) {
 }
 
 function getPerms() {
-  const raw = localStorage.getItem('permissions') || 'view';
+  const raw = sessionStorage.getItem('permissions') || 'view';
   if (raw === 'all') return ['view','add','edit','delete','manage_user','export'];
   return raw.split(',').map(x => x.trim());
 }
 
 // ── LOGOUT ─────────────────────────────────────────────
 function logout() {
-  localStorage.clear();
+  sessionStorage.removeItem('token');
+  sessionStorage.removeItem('username');
+  sessionStorage.removeItem('role');
+  sessionStorage.removeItem('permissions');
+  sessionStorage.removeItem('displayName');
   window.location.href = 'index.html';
 }
 
 // ── TOPBAR INIT ────────────────────────────────────────
 function initTopbar() {
-  const username    = localStorage.getItem('username') || '';
-  const displayName = localStorage.getItem('displayName') || username;
+  const username    = sessionStorage.getItem('username') || '';
+  const displayName = sessionStorage.getItem('displayName') || username;
 
   const navUser = document.getElementById('nav-username');
   if (navUser) navUser.textContent = displayName;
