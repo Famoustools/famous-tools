@@ -907,7 +907,7 @@
   <script>
     // ── INIT ──────────────────────────────────────────────
     // เช็ค token — ถ้าไม่มีให้ไป login
-    if (!localStorage.getItem('token')) { window.location.href = 'index.html'; }
+    if (!sessionStorage.getItem('token')) { window.location.replace('index.html'); }
 
     let allData    = [];
     let filtered   = [];
