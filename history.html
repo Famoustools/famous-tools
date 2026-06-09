@@ -85,19 +85,19 @@
     }
     .step-item:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.1); }
     .step-item::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
-    .si-ตัด::before    { background:#60a5fa; }
-    .si-เจียร::before  { background:#818cf8; }
+    .si-Cutting::before { background:#60a5fa; }
+    .si-Manual::before  { background:#818cf8; }
     .si-CNC::before    { background:#fbbf24; }
     .si-QC::before     { background:#4ade80; }
-    .si-Coding::before { background:#f97316; }
+    .si-Coating::before { background:#f97316; }
     .si-done::before   { background:#22c55e; }
     .step-item-top { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
     .step-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-    .sd-ตัด    { background:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,0.2); }
-    .sd-เจียร  { background:#818cf8; box-shadow:0 0 0 3px rgba(129,140,248,0.2); }
+    .sd-Cutting { background:#60a5fa; box-shadow:0 0 0 3px rgba(96,165,250,0.2); }
+    .sd-Manual  { background:#818cf8; box-shadow:0 0 0 3px rgba(129,140,248,0.2); }
     .sd-CNC    { background:#fbbf24; box-shadow:0 0 0 3px rgba(245,158,11,0.2); }
     .sd-QC     { background:#4ade80; box-shadow:0 0 0 3px rgba(34,197,94,0.2); }
-    .sd-Coding { background:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,0.2); }
+    .sd-Coating { background:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,0.2); }
     .sd-done   { background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,0.2); }
     .step-name-label { font-size:12px; font-weight:700; color:var(--text-primary); }
     .step-by-row { font-size:11px; color:var(--text-secondary); display:flex; align-items:center; gap:4px; margin-bottom:2px; }
@@ -106,17 +106,17 @@
 
     /* ── Summary badges ── */
     .sbadge { display:inline-flex; align-items:center; padding:2px 7px; border-radius:4px; font-size:10px; font-weight:700; margin-right:3px; }
-    .sb-ตัด       { background:rgba(96,165,250,0.12); color:#60a5fa; }
-    .sb-เจียร     { background:rgba(129,140,248,0.12); color:#818cf8; }
+    .sb-Cutting  { background:rgba(96,165,250,0.12); color:#60a5fa; }
+    .sb-Manual   { background:rgba(129,140,248,0.12); color:#818cf8; }
     .sb-CNC       { background:rgba(245,158,11,0.12);  color:#fbbf24; }
     .sb-QC        { background:rgba(34,197,94,0.12);   color:#4ade80; }
-    .sb-Coding    { background:rgba(249,115,22,0.12);  color:#f97316; }
+    .sb-Coating  { background:rgba(249,115,22,0.12);  color:#f97316; }
     .sb-done      { background:rgba(34,197,94,0.15);   color:#22c55e; font-weight:800; }
-    [data-theme="light"] .sb-ตัด    { background:#eff6ff; color:#2563eb; }
-    [data-theme="light"] .sb-เจียร  { background:#eef2ff; color:#4f46e5; }
+    [data-theme="light"] .sb-Cutting { background:#eff6ff; color:#2563eb; }
+    [data-theme="light"] .sb-Manual  { background:#eef2ff; color:#4f46e5; }
     [data-theme="light"] .sb-CNC    { background:#fffbeb; color:#d97706; }
     [data-theme="light"] .sb-QC     { background:#f0fdf4; color:#16a34a; }
-    [data-theme="light"] .sb-Coding { background:#fff7ed; color:#c2410c; }
+    [data-theme="light"] .sb-Coating { background:#fff7ed; color:#c2410c; }
     [data-theme="light"] .sb-done   { background:#dcfce7; color:#15803d; }
 
     /* ── Status badge ── */
@@ -144,10 +144,21 @@
     </div>
     <div class="sidebar-menu">
       <div class="menu-label-group">หลัก</div>
-      <div class="menu-item" data-tooltip="Dashboard" onclick="location.href='dashboard1.html'"><i class="ti ti-layout-dashboard"></i><span class="menu-label">Dashboard</span></div>
-      <div class="menu-item" data-tooltip="จัดการงาน" onclick="location.href='manage.html'"><i class="ti ti-list-check"></i><span class="menu-label">จัดการงาน</span></div>
-      <div class="menu-item" data-tooltip="กระบวนการผลิต" onclick="location.href='production.html'"><i class="ti ti-route"></i><span class="menu-label">กระบวนการผลิต</span></div>
-      <div class="menu-item" data-tooltip="เพิ่มงานใหม่" onclick="location.href='addwork.html'"><i class="ti ti-plus"></i><span class="menu-label">เพิ่มงาน</span></div>
+      <div class="menu-item" data-tooltip="งานล่าสุด" onclick="location.href='recent.html'">
+        <i class="ti ti-clock"></i><span class="menu-label">งานล่าสุด</span>
+      </div>
+      <div class="menu-item" data-tooltip="Dashboard" onclick="location.href='dashboard1.html'">
+        <i class="ti ti-layout-dashboard"></i><span class="menu-label">Dashboard</span>
+      </div>
+      <div class="menu-item" data-tooltip="จัดการงาน" onclick="location.href='manage.html'">
+        <i class="ti ti-list-check"></i><span class="menu-label">จัดการงาน</span>
+      </div>
+      <div class="menu-item" data-tooltip="เพิ่มงานใหม่" onclick="location.href='addwork.html'">
+        <i class="ti ti-plus"></i><span class="menu-label">เพิ่มงาน</span>
+      </div>
+      <div class="menu-item" data-tooltip="กระบวนการผลิต" onclick="location.href='production.html'">
+        <i class="ti ti-route"></i><span class="menu-label">กระบวนการผลิต</span>
+      </div>
       <div class="menu-label-group admin-label">ผู้ดูแล</div>
       <div class="menu-item admin-item" data-tooltip="จัดการ User" onclick="location.href='users.html'"><i class="ti ti-users"></i><span class="menu-label">จัดการผู้ใช้งาน</span></div>
       <div class="menu-item admin-item" data-tooltip="ประวัติ Login" onclick="location.href='logs.html'"><i class="ti ti-activity"></i><span class="menu-label">ประวัติเข้าระบบ</span></div>
@@ -185,12 +196,12 @@
             </div>
             <select class="step-sel" id="step-filter" onchange="renderTable()">
               <option value="">ขั้นตอนทั้งหมด</option>
-              <option value="ตัด">ตัด</option>
-              <option value="เจียร">เจียร</option>
+              <option value="Cutting">Cutting</option>
+              <option value="Manual">Manual</option>
               <option value="CNC">CNC</option>
               <option value="QC">QC</option>
-              <option value="Coding">Coding</option>
-              <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+              <option value="Coating">Coating</option>
+              <option value="Finish">Finish</option>
             </select>
             <button class="btn-f btn-blue" onclick="loadData(true)" title="รีเฟรช"><i class="ti ti-refresh"></i></button>
             <span style="font-size:11px;color:var(--text-dim)" id="last-updated"></span>
@@ -253,14 +264,14 @@
     }
 
     const STEPS = [
-      { key:'s1', label:'ตัด',       cls:'ตัด',    dot:'sd-ตัด',    si:'si-ตัด',    sb:'sb-ตัด' },
-      { key:'s2', label:'เจียร',     cls:'เจียร',  dot:'sd-เจียร',  si:'si-เจียร',  sb:'sb-เจียร' },
+      { key:'s1', label:'Cutting',   cls:'Cutting', dot:'sd-Cutting', si:'si-Cutting', sb:'sb-Cutting' },
+      { key:'s2', label:'Manual',    cls:'Manual',  dot:'sd-Manual',  si:'si-Manual',  sb:'sb-Manual' },
       { key:'s3', label:'CNC',       cls:'CNC',    dot:'sd-CNC',    si:'si-CNC',    sb:'sb-CNC' },
       { key:'s4', label:'QC',        cls:'QC',     dot:'sd-QC',     si:'si-QC',     sb:'sb-QC' },
-      { key:'s5', label:'Coding',    cls:'Coding', dot:'sd-Coding', si:'si-Coding', sb:'sb-Coding' },
-      { key:'s6', label:'เสร็จสิ้น', cls:'done',   dot:'sd-done',   si:'si-done',   sb:'sb-done' },
+      { key:'s5', label:'Coating',   cls:'Coating', dot:'sd-Coating', si:'si-Coating', sb:'sb-Coating' },
+      { key:'s6', label:'Finish',    cls:'done',    dot:'sd-done',    si:'si-done',    sb:'sb-done' },
     ];
-    const STEP_KEY = { ตัด:'s1', เจียร:'s2', CNC:'s3', QC:'s4', Coding:'s5', เสร็จสิ้น:'s6' };
+    const STEP_KEY = { Cutting:'s1', Manual:'s2', CNC:'s3', QC:'s4', Coating:'s5', Finish:'s6' };
 
     async function loadData(manual=false) {
       setRtStatus('syncing');

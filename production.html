@@ -109,11 +109,11 @@
       transition:all 0.3s;
     }
     .pipe-step.done   .pipe-dot { background:var(--accent); border-color:var(--accent); color:#fff; }
-    .pipe-step.active .pipe-dot { background:var(--accent-dim); border-color:var(--accent); color:var(--accent-light); box-shadow:0 0 0 3px var(--accent-border-dim); animation:pulse 2s ease infinite; }
+    .pipe-step.active .pipe-dot { background:rgba(245,158,11,0.15); border-color:#f59e0b; color:#fbbf24; box-shadow:0 0 0 3px rgba(245,158,11,0.2); animation:pulse 2s ease infinite; }
     .pipe-step.cancel .pipe-dot { background:rgba(100,116,139,0.15); border-color:#64748b; color:#94a3b8; }
     .pipe-label { font-size:9px; font-weight:600; color:var(--text-dim); text-align:center; text-transform:uppercase; letter-spacing:0.4px; line-height:1.2; }
     .pipe-step.done   .pipe-label { color:var(--accent-light); }
-    .pipe-step.active .pipe-label { color:var(--accent-light); font-weight:700; }
+    .pipe-step.active .pipe-label { color:#fbbf24; font-weight:700; }
 
     /* Progress bar */
     .pc-progress { padding:0 16px 14px; }
@@ -174,41 +174,73 @@
     /* Modal */
     .modal-bg { display:none; position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.5); backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:20px; }
     .modal-bg.show { display:flex; }
-    .modal { background:var(--card); border:1px solid var(--accent-border-dim); border-top:3px solid var(--accent); border-radius:14px; padding:24px; width:580px; max-width:95vw; max-height:90vh; overflow-y:auto; animation:fadeUp 0.2s ease both; }
+    @keyframes modalIn { from{opacity:0;transform:translateY(20px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+    .modal { background:var(--card); border:1px solid var(--accent-border-dim); border-radius:20px; padding:0; width:580px; max-width:95vw; max-height:90vh; overflow:hidden; display:flex; flex-direction:column; animation:modalIn 0.25s cubic-bezier(0.34,1.56,0.64,1) both; box-shadow:0 24px 60px rgba(0,0,0,0.4); }
+
+    /* Modal header */
+    .modal-title { padding:20px 24px 16px; border-bottom:1px solid var(--accent-border-dim); display:flex; align-items:center; gap:10px; background:var(--card); position:sticky; top:0; z-index:2; }
+    .modal-title i { font-size:18px; color:var(--accent-light); }
+    .modal-title span { font-size:16px; font-weight:700; color:var(--text-primary); }
+    .modal-body { padding:20px 24px; overflow-y:auto; flex:1; }
+    .modal-btns { padding:14px 24px; border-top:1px solid var(--accent-border-dim); display:flex; justify-content:flex-end; gap:8px; background:var(--card); }
 
     /* View Detail Modal */
-    .modal-view { width:660px; }
-    .vd-section { margin-bottom:18px; padding-bottom:18px; border-bottom:1px solid var(--accent-border-dim); }
+    .modal-view { width:680px; }
+    .vd-section { margin-bottom:20px; padding-bottom:20px; border-bottom:1px solid var(--accent-border-dim); }
     .vd-section:last-child { border-bottom:none; margin-bottom:0; padding-bottom:0; }
-    .vd-section-title { font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:12px; display:flex; align-items:center; gap:6px; }
+    .vd-section-title {
+      font-size:11px; font-weight:700; color:var(--accent-light);
+      text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;
+      display:flex; align-items:center; gap:6px;
+    }
+    .vd-section-title i { font-size:14px; }
     .vd-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .vd-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
-    .vd-item { background:var(--input); border:1px solid var(--accent-border-dim); border-radius:8px; padding:10px 13px; }
-    .vd-label { font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px; }
-    .vd-value { font-size:13px; color:var(--text-primary); font-weight:500; }
-    .vd-remark { background:var(--input); border:1px solid var(--accent-border-dim); border-radius:8px; padding:10px 13px; font-size:13px; color:var(--text-secondary); line-height:1.6; }
+    .vd-grid-3 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .vd-item {
+      background:var(--input); border:1px solid var(--accent-border-dim);
+      border-radius:10px; padding:12px 14px;
+      transition:border-color 0.2s;
+    }
+    .vd-item:hover { border-color:var(--accent-border); }
+    .vd-label { font-size:10px; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:5px; }
+    .vd-value { font-size:14px; color:var(--text-primary); font-weight:600; }
+    .vd-remark {
+      background:var(--input); border:1px solid var(--accent-border-dim);
+      border-radius:10px; padding:12px 14px;
+      font-size:13px; color:var(--text-secondary); line-height:1.7;
+    }
 
     /* Pipeline in modal */
-    .vd-pipeline { display:flex; align-items:center; padding:12px 0 4px; gap:0; }
+    .vd-pipeline { display:flex; align-items:center; padding:8px 0 4px; gap:0; }
     .vd-pipeline .pipe-step { gap:6px; }
-    .vd-pipeline .pipe-dot { width:32px; height:32px; font-size:14px; }
-    .vd-pipeline .pipe-label { font-size:10px; }
+    .vd-pipeline .pipe-dot { width:34px; height:34px; font-size:15px; }
+    .vd-pipeline .pipe-label { font-size:10px; font-weight:700; letter-spacing:0.5px; }
 
     /* Log list in modal */
     .vd-log-list { display:flex; flex-direction:column; gap:0; }
-    .vd-log-item { display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid var(--accent-border-dim); }
-    .vd-log-item:last-child { border-bottom:none; }
-    .vd-log-num { width:22px; height:22px; border-radius:50%; background:var(--accent-dim); border:1px solid var(--accent-border); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--accent-light); flex-shrink:0; }
-    .vd-log-step { font-weight:700; color:var(--text-primary); font-size:12px; min-width:80px; }
+    .vd-log-item {
+      display:flex; align-items:center; gap:12px;
+      padding:11px 12px; border-radius:10px; margin-bottom:4px;
+      background:var(--input); border:1px solid var(--accent-border-dim);
+      transition:border-color 0.15s;
+    }
+    .vd-log-item:hover { border-color:var(--accent-border); }
+    .vd-log-num {
+      width:26px; height:26px; border-radius:50%;
+      background:var(--accent-dim); border:1.5px solid var(--accent-border);
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; color:var(--accent-light); flex-shrink:0;
+    }
+    .vd-log-step { font-weight:700; color:var(--text-primary); font-size:13px; min-width:80px; }
     .vd-log-by { font-size:12px; color:var(--text-secondary); flex:1; display:flex; align-items:center; gap:4px; }
     .vd-log-time { font-size:11px; color:var(--text-dim); flex-shrink:0; }
-    .vd-log-empty { text-align:center; padding:16px; color:var(--text-dim); font-size:12px; }
+    .vd-log-empty { text-align:center; padding:20px; color:var(--text-dim); font-size:12px; }
 
     /* Progress bar in modal */
-    .vd-prog-bar-wrap { margin-top:10px; }
-    .vd-prog-track { height:8px; background:var(--accent-border-dim); border-radius:4px; overflow:hidden; }
-    .vd-prog-bar   { height:100%; border-radius:4px; transition:width 0.6s ease; }
-    .vd-prog-meta  { display:flex; justify-content:space-between; font-size:11px; color:var(--text-secondary); margin-top:5px; }
+    .vd-prog-bar-wrap { margin-top:12px; }
+    .vd-prog-track { height:10px; background:var(--accent-border-dim); border-radius:5px; overflow:hidden; }
+    .vd-prog-bar   { height:100%; border-radius:5px; transition:width 0.7s cubic-bezier(0.4,0,0.2,1); background:linear-gradient(90deg,var(--accent),#10b981); }
+    .vd-prog-meta  { display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); margin-top:6px; font-weight:500; }
 
     /* Card clickable */
     .prod-card { cursor:pointer; }
@@ -280,17 +312,20 @@
     </div>
     <div class="sidebar-menu">
       <div class="menu-label-group">หลัก</div>
+      <div class="menu-item" data-tooltip="งานล่าสุด" onclick="location.href='recent.html'">
+        <i class="ti ti-clock"></i><span class="menu-label">งานล่าสุด</span>
+      </div>
       <div class="menu-item" data-tooltip="Dashboard" onclick="location.href='dashboard1.html'">
         <i class="ti ti-layout-dashboard"></i><span class="menu-label">Dashboard</span>
       </div>
       <div class="menu-item" data-tooltip="จัดการงาน" onclick="location.href='manage.html'">
         <i class="ti ti-list-check"></i><span class="menu-label">จัดการงาน</span>
       </div>
+      <div class="menu-item" id="sidebar-btn-add" data-tooltip="เพิ่มงานใหม่" onclick="location.href='addwork.html'">
+        <i class="ti ti-plus"></i><span class="menu-label">เพิ่มงาน</span>
+      </div>
       <div class="menu-item active" data-tooltip="กระบวนการผลิต">
         <i class="ti ti-route"></i><span class="menu-label">กระบวนการผลิต</span>
-      </div>
-      <div class="menu-item" id="sidebar-btn-add" data-tooltip="เพิ่มงานใหม่" onclick="location.href='addwork.html'" style="display:none">
-        <i class="ti ti-plus"></i><span class="menu-label">เพิ่มงาน</span>
       </div>
       <div class="menu-label-group admin-label">ผู้ดูแล</div>
       <div class="menu-item admin-item" data-tooltip="จัดการ User" onclick="location.href='users.html'">
@@ -374,12 +409,12 @@
         </select>
         <select class="prod-sel" id="prod-step-filter" onchange="renderCards()">
           <option value="">ขั้นตอนทั้งหมด</option>
-          <option value="ตัด">✂️ ตัด</option>
-          <option value="เจียร">⭕ เจียร</option>
+          <option value="Cutting">✂️ Cutting</option>
+          <option value="Manual">⭕ Manual</option>
           <option value="CNC">⚙️ CNC</option>
           <option value="QC">✅ QC</option>
-          <option value="Coding">💻 Coding</option>
-          <option value="เสร็จสิ้น">🏁 เสร็จสิ้น</option>
+          <option value="Coating">💻 Coating</option>
+          <option value="Finish">🏁 Finish</option>
         </select>
         <select class="prod-sel" id="prod-sort" onchange="renderCards()">
           <option value="default">เรียง: ค่าเริ่มต้น</option>
@@ -410,13 +445,13 @@
           <span class="badge" id="vd-badge-status"></span>
         </div>
       </div>
+      <div class="modal-body">
 
       <!-- Section: ข้อมูลงาน -->
       <div class="vd-section">
         <div class="vd-section-title"><i class="ti ti-info-circle"></i>ข้อมูลงาน</div>
         <div class="vd-grid-3">
           <div class="vd-item"><div class="vd-label">รหัสสินค้า</div><div class="vd-value" id="vd-ref">—</div></div>
-          <div class="vd-item"><div class="vd-label">Ref ลูกค้า</div><div class="vd-value" id="vd-refcus">—</div></div>
           <div class="vd-item"><div class="vd-label">จำนวน</div><div class="vd-value" id="vd-qty">—</div></div>
         </div>
         <div class="vd-grid" style="margin-top:10px">
@@ -450,6 +485,7 @@
         </div>
       </div>
 
+      </div><!-- end modal-body -->
       <div class="modal-btns">
         <button class="btn-f btn-gray" onclick="closeModal('modal-view')"><i class="ti ti-x"></i>ปิด</button>
         <button class="btn-f btn-green" onclick="openQR()"><i class="ti ti-qrcode"></i>QR Code</button>
@@ -523,16 +559,16 @@
 
     // ── Stages definition ────────────────────────────
     const STAGES = [
-      { key:'ตัด',     label:'ตัด',     icon:'ti-cut' },
-      { key:'เจียร',   label:'เจียร',   icon:'ti-circle' },
+      { key:'Cutting', label:'Cutting', icon:'ti-cut' },
+      { key:'Manual',  label:'Manual',  icon:'ti-circle' },
       { key:'CNC',     label:'CNC',     icon:'ti-cpu' },
       { key:'QC',      label:'QC',      icon:'ti-check' },
-      { key:'Coding',  label:'Coding',  icon:'ti-code' },
-      { key:'เสร็จสิ้น',label:'เสร็จ',  icon:'ti-circle-check' },
+      { key:'Coating', label:'Coating', icon:'ti-code' },
+      { key:'Finish',  label:'Finish',  icon:'ti-circle-check' },
     ];
-    const STEP_IDX   = { ตัด:0, เจียร:1, CNC:2, QC:3, Coding:4, เสร็จสิ้น:5 };
-    const PROG_PCT   = { ตัด:10, เจียร:26, CNC:42, QC:58, Coding:74, เสร็จสิ้น:100, '':0 };
-    const PROG_COLOR = { ตัด:'#60a5fa', เจียร:'#818cf8', CNC:'#f59e0b', QC:'#4ade80', Coding:'#f97316', เสร็จสิ้น:'#22c55e', '':'#64748b' };
+    const STEP_IDX   = { Cutting:0, Manual:1, CNC:2, QC:3, Coating:4, Finish:5 };
+    const PROG_PCT   = { Cutting:10, Manual:26, CNC:42, QC:58, Coating:74, Finish:100, '':0 };
+    const PROG_COLOR = { Cutting:'#60a5fa', Manual:'#818cf8', CNC:'#f59e0b', QC:'#4ade80', Coating:'#f97316', Finish:'#22c55e', '':'#64748b' };
     const STATUS_NUM = { รอดำเนินการ:0, กำลังทำ:1, สำเร็จ:2, ยกเลิก:3 };
 
     function formatThaiDate(s) {
@@ -650,12 +686,12 @@
 
         // Status quick buttons
         const sbts = CAN_EDIT ? `<div class="status-btns">
-          <span class="sbt sbt-pending ${curStep==='ตัด'?'active':''}"      onclick="quickStep('${d.id}','ตัด')"><i class="ti ti-cut" style="font-size:10px"></i>ตัด</span>
-          <span class="sbt sbt-process ${curStep==='เจียร'?'active':''}"    onclick="quickStep('${d.id}','เจียร')"><i class="ti ti-circle" style="font-size:10px"></i>เจียร</span>
+          <span class="sbt sbt-pending ${curStep==='Cutting'?'active':''}"      onclick="quickStep('${d.id}','Cutting')"><i class="ti ti-cut" style="font-size:10px"></i>Cutting</span>
+          <span class="sbt sbt-process ${curStep==='Manual'?'active':''}"    onclick="quickStep('${d.id}','Manual')"><i class="ti ti-circle" style="font-size:10px"></i>Manual</span>
           <span class="sbt sbt-pending ${curStep==='CNC'?'active':''}"      onclick="quickStep('${d.id}','CNC')"><i class="ti ti-cpu" style="font-size:10px"></i>CNC</span>
           <span class="sbt sbt-done    ${curStep==='QC'?'active':''}"       onclick="quickStep('${d.id}','QC')"><i class="ti ti-check" style="font-size:10px"></i>QC</span>
-          <span class="sbt sbt-process ${curStep==='Coding'?'active':''}"   onclick="quickStep('${d.id}','Coding')"><i class="ti ti-code" style="font-size:10px"></i>Coding</span>
-          <span class="sbt sbt-done    ${curStep==='เสร็จสิ้น'?'active':''}" onclick="quickStep('${d.id}','เสร็จสิ้น')"><i class="ti ti-circle-check" style="font-size:10px"></i>เสร็จ</span>
+          <span class="sbt sbt-process ${curStep==='Coating'?'active':''}"   onclick="quickStep('${d.id}','Coating')"><i class="ti ti-code" style="font-size:10px"></i>Coating</span>
+          <span class="sbt sbt-done    ${curStep==='Finish'?'active':''}" onclick="quickStep('${d.id}','Finish')"><i class="ti ti-circle-check" style="font-size:10px"></i>Finish</span>
           <span class="sbt sbt-cancel  ${d.status==='ยกเลิก'?'active':''}"  onclick="quickStatus('${d.id}','ยกเลิก')"><i class="ti ti-x" style="font-size:10px"></i>ยกเลิก</span>
         </div>` : '';
 
@@ -716,9 +752,9 @@
         const res = { success: true, data: allHistory };
         if (!res.success || !res.data) return;
         const HIST_STEPS = [
-          { key:'s1', label:'ตัด' }, { key:'s2', label:'เจียร' },
+          { key:'s1', label:'Cutting' }, { key:'s2', label:'Manual' },
           { key:'s3', label:'CNC' }, { key:'s4', label:'QC' },
-          { key:'s5', label:'Coding' }, { key:'s6', label:'เสร็จสิ้น' },
+          { key:'s5', label:'Coating' }, { key:'s6', label:'Finish' },
         ];
         list.forEach(d => {
           const el = document.getElementById('log-' + d.id);
@@ -742,7 +778,7 @@
             const card      = el.closest('.prod-card');
             if (card) {
               card.querySelectorAll('.pipe-step').forEach((dot, i) => {
-                const keyMap = { 'ตัด':'ตัด','เจียร':'เจียร','CNC':'CNC','QC':'QC','Coding':'Coding','เสร็จ':'เสร็จสิ้น' };
+                const keyMap = { 'Cutting':'Cutting','Manual':'Manual','CNC':'CNC','QC':'QC','Coating':'Coating','Finish':'Finish' };
                 const label  = dot.querySelector('.pipe-label')?.textContent?.trim();
                 const key    = keyMap[label] || label;
                 dot.classList.remove('done','active','cancel');
@@ -776,10 +812,10 @@
       // Optimistic update allData ทันที
       d.step = newStep;
       if (d.status === 'รอดำเนินการ') d.status = 'กำลังทำ';
-      if (newStep === 'เสร็จสิ้น') d.status = 'สำเร็จ';
+      if (newStep === 'Finish') d.status = 'สำเร็จ';
 
       // Optimistic update allHistory ทันที
-      const STEP_KEY = { 'ตัด':'s1','เจียร':'s2','CNC':'s3','QC':'s4','Coding':'s5','เสร็จสิ้น':'s6' };
+      const STEP_KEY = { 'Cutting':'s1','Manual':'s2','CNC':'s3','QC':'s4','Coating':'s5','Finish':'s6' };
       const sk = STEP_KEY[newStep];
       if (sk) {
         let row = allHistory.find(r => String(r.ref||'').trim() === String(d.ref||'').trim()
@@ -855,7 +891,6 @@
 
       // Info fields
       document.getElementById('vd-ref').textContent      = d.ref       || '—';
-      document.getElementById('vd-refcus').textContent   = d.refcus    || '—';
       document.getElementById('vd-qty').textContent      = d.qty       || '—';
       document.getElementById('vd-startdate').textContent= formatDatetime(d.startdate);
       const dueEl = document.getElementById('vd-duedate');
@@ -897,9 +932,9 @@
 
       // Load log async — ใช้ getHistoryLog แล้ว filter เอาของงานนี้
       const HIST_STEPS = [
-        { key:'s1', label:'ตัด' }, { key:'s2', label:'เจียร' },
+        { key:'s1', label:'Cutting' }, { key:'s2', label:'Manual' },
         { key:'s3', label:'CNC' }, { key:'s4', label:'QC' },
-        { key:'s5', label:'Coding' }, { key:'s6', label:'เสร็จสิ้น' },
+        { key:'s5', label:'Coating' }, { key:'s6', label:'Finish' },
       ];
       Promise.resolve({ success:true, data:allHistory }).then(res => {
         if (res.success && res.data) {
@@ -958,8 +993,8 @@
       const d = allData.find(x => x.id === viewId); if (!d) return;
 
       // ข้อมูลใน QR: URL ของหน้า production พร้อม filter ref
-      const base = window.location.href.split('?')[0];
-      const qrUrl = `${base}?ref=${encodeURIComponent(d.ref || d.title || d.id)}&view=${encodeURIComponent(d.id)}`;
+      const base = window.location.href.split('?')[0].replace('production.html','scan.html');
+      const qrUrl = `${base}?ref=${encodeURIComponent(d.ref || d.title || d.id)}`;
 
       document.getElementById('qr-job-name').textContent = d.title || '—';
       const stepText = d.step || 'ยังไม่เริ่ม';

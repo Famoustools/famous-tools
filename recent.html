@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <style id="admin-hide">.admin-item{display:none!important}.admin-item::after{content:none!important}.admin-label{display:none!important}</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Famous Tools - งานล่าสุด 10 รายการ</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+  <link rel="stylesheet" href="sidebar.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+    .topbar-left > i { color:#f59e0b !important; }
+
+    /* ── Animations ── */
+    @keyframes cardIn {
+      from { opacity:0; transform:translateY(20px) scale(0.97); }
+      to   { opacity:1; transform:translateY(0) scale(1); }
+    }
+    @keyframes shimmerMove {
+      0%   { transform:translateX(-100%); }
+      100% { transform:translateX(200%); }
+    }
+    @keyframes pulseGlow {
+      0%,100% { opacity:0.6; }
+      50%      { opacity:1; }
+    }
+    @keyframes floatUp {
+      0%,100% { transform:translateY(0px); }
+      50%      { transform:translateY(-4px); }
+    }
+
+    /* ── Grid ── */
+    .recent-grid {
+      display:grid;
+      grid-template-columns:repeat(5, 1fr);
+      gap:16px;
+    }
+    @media(max-width:1400px){ .recent-grid{ grid-template-columns:repeat(4,1fr); } }
+    @media(max-width:1100px){ .recent-grid{ grid-template-columns:repeat(3,1fr); } }
+    @media(max-width:780px) { .recent-grid{ grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:500px) { .recent-grid{ grid-template-columns:1fr; } }
+
+    /* ── Card ── */
+    .work-card {
+      background:var(--card);
+      border:1px solid var(--accent-border-dim);
+      border-radius:18px;
+      padding:20px 18px 16px;
+      position:relative;
+      overflow:hidden;
+      cursor:default;
+      transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s ease;
+      animation:cardIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    .work-card:hover {
+      transform:translateY(-6px) scale(1.01);
+      box-shadow:0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    /* Shimmer on hover */
+    .work-card::after {
+      content:'';
+      position:absolute; top:0; left:0; right:0; bottom:0;
+      background:linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.04) 50%, transparent 60%);
+      transform:translateX(-100%);
+      transition:none; pointer-events:none;
+    }
+    .work-card:hover::after { animation:shimmerMove 0.6s ease; }
+
+    /* Top gradient bar */
+    .work-card::before {
+      content:'';
+      position:absolute; left:0; top:0; right:0; height:3px;
+      border-radius:18px 18px 0 0;
+    }
+    .work-card.s-pending::before  { background:linear-gradient(90deg,#3b82f6,#818cf8); }
+    .work-card.s-process::before  { background:linear-gradient(90deg,#f59e0b,#fb923c); }
+    .work-card.s-done::before     { background:linear-gradient(90deg,#22c55e,#10b981); }
+    .work-card.s-cancel::before   { background:linear-gradient(90deg,#ef4444,#f97316); }
+    .work-card.s-other::before    { background:linear-gradient(90deg,#64748b,#94a3b8); }
+
+    /* Glow border on hover */
+    .work-card.s-pending:hover { border-color:rgba(59,130,246,0.4);  box-shadow:0 20px 40px rgba(59,130,246,0.15); }
+    .work-card.s-process:hover { border-color:rgba(245,158,11,0.4);  box-shadow:0 20px 40px rgba(245,158,11,0.15); }
+    .work-card.s-done:hover    { border-color:rgba(34,197,94,0.4);   box-shadow:0 20px 40px rgba(34,197,94,0.15); }
+    .work-card.s-cancel:hover  { border-color:rgba(239,68,68,0.4);   box-shadow:0 20px 40px rgba(239,68,68,0.15); }
+
+    /* Card number badge */
+    .card-num {
+      position:absolute; top:14px; right:14px;
+      font-size:10px; font-weight:700; color:var(--text-dim);
+      background:var(--accent-border-dim);
+      padding:2px 8px; border-radius:20px;
+      letter-spacing:0.5px;
+    }
+
+    /* Ref */
+    .card-ref {
+      font-family:'Kanit', sans-serif;
+      font-size:22px; font-weight:600; color:var(--text-primary);
+      letter-spacing:0.3px; margin-bottom:3px;
+      display:flex; align-items:center; gap:8px;
+      padding-right:40px;
+    }
+    .card-title {
+      font-size:12px; color:var(--text-secondary);
+      margin-bottom:16px;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      padding-right:40px;
+    }
+
+    .card-meta {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:6px; flex-wrap:wrap;
+    }
+
+    /* Status badge */
+    .status-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:4px 11px; border-radius:20px;
+      font-size:11px; font-weight:600; letter-spacing:0.3px;
+    }
+    .status-badge i { font-size:11px; }
+
+    .sb-pending { background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.2); }
+    .sb-process { background:rgba(245,158,11,0.12); color:#fbbf24; border:1px solid rgba(245,158,11,0.2); }
+    .sb-done    { background:rgba(34,197,94,0.12);  color:#4ade80; border:1px solid rgba(34,197,94,0.2); }
+    .sb-cancel  { background:rgba(239,68,68,0.12);  color:#f87171; border:1px solid rgba(239,68,68,0.2); }
+    .sb-other   { background:rgba(100,116,139,0.12); color:#94a3b8; border:1px solid rgba(100,116,139,0.2); }
+
+    /* Step badge */
+    .step-badge {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:3px 9px; border-radius:20px;
+      font-size:11px; color:var(--text-secondary);
+      background:var(--accent-border-dim);
+      border:1px solid var(--accent-border-dim);
+    }
+    .step-badge i { font-size:11px; color:var(--accent-light); }
+
+    /* Priority dot */
+    .prio-dot {
+      width:8px; height:8px; border-radius:50%; display:inline-block; flex-shrink:0;
+    }
+    .prio-high { background:#f87171; box-shadow:0 0 0 3px rgba(248,113,113,0.2); animation:pulseGlow 2s infinite; }
+    .prio-mid  { background:#fbbf24; box-shadow:0 0 0 3px rgba(251,191,36,0.2); }
+    .prio-low  { background:#4ade80; box-shadow:0 0 0 3px rgba(74,222,128,0.2); }
+
+    /* Due date */
+    .card-due {
+      margin-top:12px; padding-top:12px;
+      border-top:1px solid var(--accent-border-dim);
+      display:flex; align-items:center; gap:6px;
+      font-size:11px; color:var(--text-dim);
+    }
+    .card-due i { font-size:12px; }
+    .due-overdue { color:#f87171 !important; }
+    .due-soon    { color:#fbbf24 !important; }
+
+    /* Empty / Skeleton */
+    .empty-state {
+      grid-column:1/-1; text-align:center; padding:60px 20px;
+      color:var(--text-dim);
+    }
+    .empty-state i { font-size:48px; margin-bottom:12px; display:block; opacity:0.4; }
+    .skeleton-card {
+      background:var(--card); border:1px solid var(--accent-border-dim);
+      border-radius:18px; padding:20px 18px; height:140px;
+    }
+    .sk-line { height:12px; border-radius:4px; margin-bottom:8px; }
+
+    /* Section header */
+    .section-header {
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom:16px; flex-wrap:wrap; gap:10px;
+    }
+    .section-title {
+      font-family:'Kanit', sans-serif;
+      font-size:17px; font-weight:600; color:var(--text-primary);
+      display:flex; align-items:center; gap:8px;
+    }
+    .section-title i { color:#f59e0b; font-size:20px; }
+    .section-sub { font-size:12px; color:var(--text-dim); margin-top:2px; }
+
+    /* Stats grid override */
+    .stats-grid .stat-card {
+      border-radius:16px;
+      transition:transform 0.2s, box-shadow 0.2s;
+    }
+    .stats-grid .stat-card:hover { transform:translateY(-3px); }
+
+    /* Refresh info */
+    .refresh-info { display:flex; align-items:center; gap:8px; font-size:11px; color:var(--text-dim); }
+    .rt-dot { width:7px; height:7px; border-radius:50%; background:#4ade80; animation:pulseGlow 2s infinite; }
+    .rt-dot.syncing { background:#fbbf24; }
+    .rt-dot.error   { background:#f87171; animation:none; }
+
+    /* Light mode */
+    [data-theme="light"] .work-card { background:#fff; }
+    [data-theme="light"] .work-card:hover { box-shadow:0 20px 40px rgba(0,0,0,0.1); }
+    [data-theme="light"] .card-ref { color:#111827; }
+    [data-theme="light"] .card-title { color:#6b7280; }
+    [data-theme="light"] .sb-pending { background:#eff6ff; color:#2563eb; border-color:#bfdbfe; }
+    [data-theme="light"] .sb-process { background:#fffbeb; color:#d97706; border-color:#fde68a; }
+    [data-theme="light"] .sb-done    { background:#f0fdf4; color:#16a34a; border-color:#bbf7d0; }
+    [data-theme="light"] .sb-cancel  { background:#fef2f2; color:#dc2626; border-color:#fecaca; }
+    [data-theme="light"] .card-num   { color:#9ca3af; background:#f3f4f6; }
+    [data-theme="light"] .card-due   { color:#9ca3af; border-top-color:#f3f4f6; }
+    [data-theme="light"] .step-badge { background:#f3f4f6; color:#6b7280; border-color:#e5e7eb; }
+    [data-theme="light"] .step-badge i { color:#0d9488; }
+
+    /* ── Pipeline in card ── */
+    .card-pipeline {
+      display:flex; align-items:center; gap:0;
+      margin-top:14px; padding-top:12px;
+      border-top:1px solid var(--accent-border-dim);
+      overflow-x:auto; scrollbar-width:none;
+    }
+    .card-pipeline::-webkit-scrollbar { display:none; }
+    .cp-step { display:flex; align-items:center; gap:0; flex-shrink:0; }
+    .cp-dot {
+      width:26px; height:26px; border-radius:50%;
+      border:2px solid var(--accent-border-dim);
+      background:var(--input);
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; color:var(--text-dim);
+      transition:all 0.2s; flex-shrink:0;
+    }
+    .cp-dot.done  { background:#0d9488; border-color:#0d9488; color:#fff; }
+    .cp-dot.active{ background:#f59e0b; border-color:#f59e0b; color:#fff; box-shadow:0 0 0 3px rgba(245,158,11,0.2); }
+    .cp-label { font-size:9px; font-weight:700; color:var(--text-dim); margin-top:3px; letter-spacing:0.3px; text-align:center; }
+    .cp-label.done   { color:#0d9488; }
+    .cp-label.active { color:#f59e0b; }
+    .cp-node { display:flex; flex-direction:column; align-items:center; gap:0; }
+    .cp-line { width:16px; height:2px; background:var(--accent-border-dim); flex-shrink:0; margin-bottom:14px; }
+    .cp-line.done { background:#0d9488; }
+    [data-theme="light"] .cp-dot { background:#f9fafb; border-color:#e5e7eb; color:#9ca3af; }
+    [data-theme="light"] .cp-dot.done { background:#0d9488; border-color:#0d9488; color:#fff; }
+    [data-theme="light"] .cp-dot.active { background:#f59e0b; border-color:#f59e0b; color:#fff; }
+    [data-theme="light"] .cp-line { background:#e5e7eb; }
+    [data-theme="light"] .cp-label { color:#9ca3af; }
+
+    /* ── Stat Cards (dashboard style) ── */
+    @keyframes scCountUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+    .stat-card {
+      display:flex; align-items:center; gap:16px;
+      padding:18px 20px; border-radius:14px;
+      border:1px solid var(--accent-border-dim);
+      background:var(--card); position:relative; overflow:hidden;
+      transition:transform 0.2s, box-shadow 0.2s; cursor:default;
+    }
+    .stat-card:hover { transform:translateY(-3px); }
+    .stat-card-total   { border-color:#3b82f6; box-shadow:0 0 0 1px rgba(59,130,246,0.2),0 0 20px rgba(59,130,246,0.12); }
+    .stat-card-pending { border-color:#818cf8; box-shadow:0 0 0 1px rgba(129,140,248,0.2),0 0 20px rgba(129,140,248,0.12); }
+    .stat-card-process { border-color:#f59e0b; box-shadow:0 0 0 1px rgba(245,158,11,0.2),0 0 20px rgba(245,158,11,0.12); }
+    .stat-card-done    { border-color:#22c55e; box-shadow:0 0 0 1px rgba(34,197,94,0.2),0 0 20px rgba(34,197,94,0.12); }
+    .stat-card-total:hover   { box-shadow:0 0 0 1px rgba(59,130,246,0.4),0 0 28px rgba(59,130,246,0.22); }
+    .stat-card-pending:hover { box-shadow:0 0 0 1px rgba(129,140,248,0.4),0 0 28px rgba(129,140,248,0.22); }
+    .stat-card-process:hover { box-shadow:0 0 0 1px rgba(245,158,11,0.4),0 0 28px rgba(245,158,11,0.22); }
+    .stat-card-done:hover    { box-shadow:0 0 0 1px rgba(34,197,94,0.4),0 0 28px rgba(34,197,94,0.22); }
+    [data-theme="light"] .stat-card-total   { border-color:#93c5fd; box-shadow:0 0 0 1px rgba(59,130,246,0.15),0 4px 16px rgba(59,130,246,0.1); }
+    [data-theme="light"] .stat-card-pending { border-color:#c7d2fe; box-shadow:0 0 0 1px rgba(99,102,241,0.15),0 4px 16px rgba(99,102,241,0.1); }
+    [data-theme="light"] .stat-card-process { border-color:#fde68a; box-shadow:0 0 0 1px rgba(245,158,11,0.15),0 4px 16px rgba(245,158,11,0.1); }
+    [data-theme="light"] .stat-card-done    { border-color:#bbf7d0; box-shadow:0 0 0 1px rgba(34,197,94,0.15),0 4px 16px rgba(34,197,94,0.1); }
+    .sc-icon-wrap { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+    .sc-icon-total   { background:rgba(59,130,246,0.15);  color:#60a5fa; border:1px solid rgba(59,130,246,0.25); }
+    .sc-icon-pending { background:rgba(59,130,246,0.15);  color:#818cf8; border:1px solid rgba(99,102,241,0.25); }
+    .sc-icon-process { background:rgba(245,158,11,0.15);  color:#fbbf24; border:1px solid rgba(245,158,11,0.25); }
+    .sc-icon-done    { background:rgba(34,197,94,0.15);   color:#4ade80; border:1px solid rgba(34,197,94,0.25); }
+    .sc-body { flex:1; min-width:0; }
+    .sc-label { font-size:11px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:4px; }
+    .sc-value { font-size:28px; font-weight:700; line-height:1.1; color:var(--text-primary); animation:scCountUp 0.4s ease both; }
+    .sc-sub   { font-size:11px; color:var(--text-secondary); margin-top:3px; }
+    .sc-bar-wrap { height:5px; background:var(--accent-border-dim); border-radius:3px; overflow:hidden; margin-top:10px; }
+    .sc-bar { height:100%; border-radius:3px; transition:width 0.7s cubic-bezier(0.4,0,0.2,1); }
+    .sc-bar-pending { background:linear-gradient(90deg,#3b82f6,#818cf8); }
+    .sc-bar-process { background:linear-gradient(90deg,#f59e0b,#fb923c); }
+    .sc-bar-done    { background:linear-gradient(90deg,#22c55e,#10b981); }
+    [data-theme="light"] .stat-card { background:#ffffff; }
+    [data-theme="light"] .sc-icon-total   { background:#eff6ff; color:#2563eb; border-color:#bfdbfe; }
+    [data-theme="light"] .sc-icon-pending { background:#eef2ff; color:#4f46e5; border-color:#c7d2fe; }
+    [data-theme="light"] .sc-icon-process { background:#fffbeb; color:#d97706; border-color:#fde68a; }
+    [data-theme="light"] .sc-icon-done    { background:#f0fdf4; color:#16a34a; border-color:#bbf7d0; }
+    [data-theme="light"] .sc-label { color:#6b7280; }
+    [data-theme="light"] .sc-sub   { color:#9ca3af; }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="icon"><i class="ti ti-shield-lock"></i></div>
+      <span class="logo-text">Famous Tools</span>
+    </div>
+    <div class="sidebar-menu">
+      <div class="menu-label-group">หลัก</div>
+      <div class="menu-item active" data-tooltip="งานล่าสุด" onclick="location.href='recent.html'">
+        <i class="ti ti-clock"></i><span class="menu-label">งานล่าสุด</span>
+      </div>
+      <div class="menu-item" data-tooltip="Dashboard" onclick="location.href='dashboard1.html'">
+        <i class="ti ti-layout-dashboard"></i><span class="menu-label">Dashboard</span>
+      </div>
+      <div class="menu-item" data-tooltip="จัดการงาน" onclick="location.href='manage.html'">
+        <i class="ti ti-list-check"></i><span class="menu-label">จัดการงาน</span>
+      </div>
+      <div class="menu-item" data-tooltip="เพิ่มงานใหม่" onclick="location.href='addwork.html'">
+        <i class="ti ti-plus"></i><span class="menu-label">เพิ่มงาน</span>
+      </div>
+      <div class="menu-item" data-tooltip="กระบวนการผลิต" onclick="location.href='production.html'">
+        <i class="ti ti-route"></i><span class="menu-label">กระบวนการผลิต</span>
+      </div>
+      <div class="menu-label-group admin-label">ผู้ดูแล</div>
+      <div class="menu-item admin-item" data-tooltip="จัดการ User" onclick="location.href='users.html'">
+        <i class="ti ti-users"></i><span class="menu-label">จัดการผู้ใช้งาน</span>
+      </div>
+      <div class="menu-item admin-item" data-tooltip="ประวัติ Login" onclick="location.href='logs.html'">
+        <i class="ti ti-activity"></i><span class="menu-label">ประวัติเข้าระบบ</span>
+      </div>
+      <div class="menu-item admin-item" data-tooltip="ประวัติขั้นตอน" onclick="location.href='history.html'">
+        <i class="ti ti-clipboard-list"></i><span class="menu-label">ประวัติขั้นตอน</span>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="menu-item" onclick="toggleSidebar()">
+        <i class="ti ti-chevrons-left" id="collapse-icon"></i>
+        <span class="menu-label footer-label">ซ่อนแถบเมนู</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="main" id="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <i class="ti ti-clock"></i>
+        <div>
+          <h1>งานล่าสุด 10 รายการ</h1>
+          <p>เลขใบงานและสถานะงานที่เพิ่มล่าสุด</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span id="role-badge" class="role-badge"></span>
+        <span class="username-text" id="nav-username"></span>
+        <div class="avatar"><i class="ti ti-user"></i></div>
+        <button id="theme-toggle" onclick="toggleTheme()"></button>
+        <button class="btn-logout" onclick="logout()"><i class="ti ti-logout"></i>ออกจากระบบ</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- Stats Summary -->
+      <div class="stats-grid">
+        <div class="stat-card stat-card-total">
+          <div class="sc-icon-wrap sc-icon-total"><i class="ti ti-clipboard-list"></i></div>
+          <div class="sc-body">
+            <div class="sc-label">งานทั้งหมด</div>
+            <div class="sc-value" id="st-total">—</div>
+            <div class="sc-sub">รายการในระบบ</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card-pending">
+          <div class="sc-icon-wrap sc-icon-pending"><i class="ti ti-clock"></i></div>
+          <div class="sc-body">
+            <div class="sc-label">รอดำเนินการ</div>
+            <div class="sc-value" id="st-pending">—</div>
+            <div class="sc-sub">รายการ</div>
+            <div class="sc-bar-wrap"><div class="sc-bar sc-bar-pending" id="bar-pending" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="stat-card stat-card-process">
+          <div class="sc-icon-wrap sc-icon-process"><i class="ti ti-loader-2"></i></div>
+          <div class="sc-body">
+            <div class="sc-label">กำลังดำเนินการ</div>
+            <div class="sc-value" id="st-process">—</div>
+            <div class="sc-sub">รายการ</div>
+            <div class="sc-bar-wrap"><div class="sc-bar sc-bar-process" id="bar-process" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="stat-card stat-card-done">
+          <div class="sc-icon-wrap sc-icon-done"><i class="ti ti-circle-check"></i></div>
+          <div class="sc-body">
+            <div class="sc-label">เสร็จสิ้น</div>
+            <div class="sc-value" id="st-done">—</div>
+            <div class="sc-sub">รายการ</div>
+            <div class="sc-bar-wrap"><div class="sc-bar sc-bar-done" id="bar-done" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Header -->
+      <div class="section-header">
+        <div>
+          <div class="section-title">
+            <i class="ti ti-clock-bolt"></i>
+            งานที่เพิ่มล่าสุด 10 รายการ
+          </div>
+          <div class="section-sub" id="last-updated">กำลังโหลดข้อมูล...</div>
+        </div>
+        <div class="refresh-info">
+          <div class="rt-dot" id="rt-dot"></div>
+          <span id="rt-label" style="font-size:11px;color:var(--text-dim)">Live</span>
+          <button class="btn-f btn-blue" onclick="loadData(true)" style="margin-left:4px">
+            <i class="ti ti-refresh"></i>
+          </button>
+          <button class="btn-f btn-gray" onclick="location.href='dashboard1.html'" style="margin-left:2px">
+            <i class="ti ti-layout-dashboard"></i>
+            <span style="font-size:11px">ดูทั้งหมด</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cards Grid -->
+      <div class="recent-grid" id="recent-grid">
+        <!-- Skeleton loaders -->
+        <div class="skeleton-card"><div class="sk-line skeleton" style="width:50%"></div><div class="sk-line skeleton" style="width:80%;margin-top:12px"></div><div class="sk-line skeleton" style="width:40%;margin-top:20px;height:24px;border-radius:20px"></div></div>
+        <div class="skeleton-card"><div class="sk-line skeleton" style="width:60%"></div><div class="sk-line skeleton" style="width:70%;margin-top:12px"></div><div class="sk-line skeleton" style="width:35%;margin-top:20px;height:24px;border-radius:20px"></div></div>
+        <div class="skeleton-card"><div class="sk-line skeleton" style="width:45%"></div><div class="sk-line skeleton" style="width:85%;margin-top:12px"></div><div class="sk-line skeleton" style="width:45%;margin-top:20px;height:24px;border-radius:20px"></div></div>
+        <div class="skeleton-card"><div class="sk-line skeleton" style="width:55%"></div><div class="sk-line skeleton" style="width:65%;margin-top:12px"></div><div class="sk-line skeleton" style="width:38%;margin-top:20px;height:24px;border-radius:20px"></div></div>
+        <div class="skeleton-card"><div class="sk-line skeleton" style="width:50%"></div><div class="sk-line skeleton" style="width:75%;margin-top:12px"></div><div class="sk-line skeleton" style="width:42%;margin-top:20px;height:24px;border-radius:20px"></div></div>
+        <div class="skeleton-card"><div class="sk-line skeleton" style="width:48%"></div><div class="sk-line skeleton" style="width:72%;margin-top:12px"></div><div class="sk-line skeleton" style="width:36%;margin-top:20px;height:24px;border-radius:20px"></div></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="theme.js"></script>
+  <script>
+    authGuard('view');
+
+    let allData = [];
+    let rtTimer = null;
+    const RT_INTERVAL = 30;
+    let rtCountdown = RT_INTERVAL;
+
+    // ── STATUS HELPERS ──────────────────────────────────────
+    function getStatusClass(status) {
+      const s = String(status || '').toLowerCase();
+      if (s.includes('รอ') || s.includes('pending'))    return 'pending';
+      if (s.includes('กำลัง') || s.includes('ดำเนิน') || s.includes('process')) return 'process';
+      if (s.includes('เสร็จ') || s.includes('สำเร็จ') || s.includes('done'))    return 'done';
+      if (s.includes('ยกเลิก') || s.includes('cancel'))                          return 'cancel';
+      return 'other';
+    }
+
+    function getStatusBadge(status) {
+      const cls = getStatusClass(status);
+      const icons = { pending:'ti-clock', process:'ti-loader-2', done:'ti-circle-check', cancel:'ti-circle-x', other:'ti-point' };
+      const icon = icons[cls] || 'ti-point';
+      return `<span class="status-badge sb-${cls}"><i class="ti ${icon}"></i>${status || '—'}</span>`;
+    }
+
+    function getPrioDot(priority) {
+      const p = String(priority || '').toLowerCase();
+      if (p.includes('ด่วน') || p.includes('สูง')) return '<span class="prio-dot prio-high" title="ด่วน/สูง"></span>';
+      if (p.includes('ปกติ') || p.includes('กลาง'))   return '<span class="prio-dot prio-mid"  title="ปกติ/กลาง"></span>';
+      if (p.includes('ต่ำ'))                           return '<span class="prio-dot prio-low"  title="ต่ำ"></span>';
+      return '';
+    }
+
+    function getDueClass(dueDateStr) {
+      if (!dueDateStr) return '';
+      const due = new Date(dueDateStr);
+      if (isNaN(due)) return '';
+      const now = new Date();
+      const diff = (due - now) / 86400000;
+      if (diff < 0)  return 'due-overdue';
+      if (diff <= 3) return 'due-soon';
+      return '';
+    }
+
+    function formatDue(dueDateStr) {
+      if (!dueDateStr) return '—';
+      const d = new Date(dueDateStr);
+      if (isNaN(d)) return dueDateStr;
+      const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    // ── RENDER ──────────────────────────────────────────────
+    function renderCards(data) {
+      const grid = document.getElementById('recent-grid');
+      if (!data || data.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <i class="ti ti-inbox"></i>
+            <p>ไม่พบข้อมูลงาน</p>
+          </div>`;
+        return;
+      }
+
+      // ใช้ 10 รายการสุดท้าย (ล่าสุดที่เพิ่ม = index สูงสุด)
+      const recent = [...data].slice(-10).reverse();
+
+      grid.innerHTML = recent.map((item, idx) => {
+        const cls = getStatusClass(item.status);
+        const prioDot = getPrioDot(item.priority);
+        const dueClass = getDueClass(item.duedate);
+        const STEPS = ['Cutting','Manual','CNC','QC','Coating','Finish'];
+        const STEP_ICONS = { Cutting:'ti-cut', Manual:'ti-circle', CNC:'ti-settings', QC:'ti-check', Coating:'ti-droplet', Finish:'ti-flag' };
+        const STEP_MAP = { 'ตัด':'Cutting','เจียร':'Manual','Coding':'Coating','เสร็จสิ้น':'Finish' };
+        const doneSteps = new Set((item.steps||[]).map(s => STEP_MAP[s]||s));
+        const normStep = STEP_MAP[item.step] || item.step;
+        const curStepIdx = STEPS.indexOf(normStep);
+
+        const pipelineHtml = `
+          <div class="card-pipeline">
+            ${STEPS.map((s, si) => {
+              const isDone   = doneSteps.size > 0 ? doneSteps.has(s) && curStepIdx !== si : curStepIdx >= 0 && curStepIdx > si;
+              const isActive = curStepIdx === si;
+              const cls2 = isDone ? 'done' : isActive ? 'active' : '';
+              return `
+                <div class="cp-step">
+                  <div class="cp-node">
+                    <div class="cp-dot ${cls2}"><i class="ti ${STEP_ICONS[s]}" style="font-size:10px"></i></div>
+                    <div class="cp-label ${cls2}">${s}</div>
+                  </div>
+                  ${si < STEPS.length - 1 ? `<div class="cp-line ${isDone ? 'done' : ''}"></div>` : ''}
+                </div>`;
+            }).join('')}
+          </div>`;
+
+        return `
+        <div class="work-card s-${cls}" style="animation-delay:${idx * 50}ms">
+          <span class="card-num">#${idx + 1}</span>
+          <div class="card-ref">
+            ${prioDot}
+            ${item.ref || '—'}
+          </div>
+          <div class="card-title" title="${item.title || ''}">${item.title || '—'}</div>
+          <div class="card-meta">
+            ${getStatusBadge(item.status)}
+          </div>
+          ${pipelineHtml}
+          ${item.duedate ? `
+          <div class="card-due ${dueClass}" style="margin-top:10px;padding-top:10px">
+            <i class="ti ti-calendar-due"></i>
+            กำหนดส่ง: <strong>${formatDue(item.duedate)}</strong>
+            ${dueClass === 'due-overdue' ? '<span style="margin-left:4px">⚠️ เกินกำหนด</span>' : dueClass === 'due-soon' ? '<span style="margin-left:4px">⏰ ใกล้ครบ</span>' : ''}
+          </div>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    // ── STATS ───────────────────────────────────────────────
+    function updateStats(data) {
+      const total   = data.length;
+      const pending = data.filter(d => getStatusClass(d.status) === 'pending').length;
+      const process = data.filter(d => getStatusClass(d.status) === 'process').length;
+      const done    = data.filter(d => getStatusClass(d.status) === 'done').length;
+      document.getElementById('st-total').textContent   = total;
+      document.getElementById('st-pending').textContent = pending;
+      document.getElementById('st-process').textContent = process;
+      document.getElementById('st-done').textContent    = done;
+      if (total > 0) {
+        setTimeout(() => {
+          document.getElementById('bar-pending').style.width = (pending/total*100) + '%';
+          document.getElementById('bar-process').style.width = (process/total*100) + '%';
+          document.getElementById('bar-done').style.width    = (done/total*100) + '%';
+        }, 100);
+      }
+    }
+
+    // ── LOAD DATA ───────────────────────────────────────────
+    async function loadData(manual = false) {
+      setRtStatus('syncing');
+      try {
+        const res = await apiCall({ action: 'getData' });
+        if (res.success) {
+          allData = res.data || [];
+          updateStats(allData);
+          renderCards(allData);
+          const now = new Date().toLocaleTimeString('th-TH');
+          document.getElementById('last-updated').textContent = 'อัพเดตล่าสุด ' + now;
+          setRtStatus('live');
+          if (manual) showToast('โหลดข้อมูลสำเร็จ', 'success', 1500);
+        } else {
+          setRtStatus('error');
+          if (manual) showToast('โหลดไม่สำเร็จ', 'error');
+        }
+      } catch(e) {
+        setRtStatus('error');
+        document.getElementById('recent-grid').innerHTML = `
+          <div class="empty-state">
+            <i class="ti ti-wifi-off"></i>
+            <p>ไม่สามารถเชื่อมต่อได้</p>
+          </div>`;
+        if (manual) showToast('ไม่สามารถเชื่อมต่อได้', 'error');
+      }
+    }
+
+    // ── REAL-TIME ───────────────────────────────────────────
+    function setRtStatus(state) {
+      const dot = document.getElementById('rt-dot');
+      const lbl = document.getElementById('rt-label');
+      if (!dot || !lbl) return;
+      dot.className = 'rt-dot' + (state === 'syncing' ? ' syncing' : state === 'error' ? ' error' : '');
+      lbl.textContent = state === 'syncing' ? 'กำลังซิงค์...' : state === 'error' ? 'ขาดการเชื่อมต่อ' : 'Live';
+    }
+
+    function startRealtime() {
+      rtCountdown = RT_INTERVAL;
+      rtTimer = setInterval(() => {
+        rtCountdown--;
+        if (rtCountdown <= 0) {
+          rtCountdown = RT_INTERVAL;
+          loadData();
+        }
+      }, 1000);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        clearInterval(rtTimer);
+      } else {
+        loadData().then(() => startRealtime());
+      }
+    });
+
+    loadData().then(() => startRealtime());
+  </script>
+</body>
+</html>

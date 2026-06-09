@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Famous Tools — สถานะงาน</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css"/>
+  <link rel="stylesheet" href="sidebar.css"/>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html,body{font-family:'Segoe UI',sans-serif;min-height:100vh;background:var(--bg);}
+
+    /* ── Responsive layout ── */
+    body{display:flex;flex-direction:column;align-items:center;padding:20px 16px 48px;}
+    @media(min-width:768px){body{padding:32px 24px 60px;}}
+
+    /* ── Top bar ── */
+    .topbar{width:100%;max-width:680px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding:12px 18px;background:var(--card);border:1px solid var(--accent-border-dim);border-radius:16px;}
+    .brand{display:flex;align-items:center;gap:10px;}
+    .brand-icon{width:34px;height:34px;border-radius:9px;background:var(--accent-dim);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;color:var(--accent-light);font-size:17px;}
+    .brand-name{font-family:'Kanit',sans-serif;font-size:13px;font-weight:600;color:var(--text-primary);letter-spacing:3px;text-transform:uppercase;}
+    .topbar-right{display:flex;align-items:center;gap:8px;}
+    .scan-badge{font-size:10px;font-weight:700;color:var(--accent-light);background:var(--accent-dim);border:1px solid var(--accent-border);padding:3px 10px;border-radius:20px;letter-spacing:1px;}
+    .theme-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--accent-border-dim);background:transparent;color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background 0.2s;}
+    .theme-btn:hover{background:var(--accent-dim);}
+
+    /* ── Main card ── */
+    .view-card{width:100%;max-width:680px;background:var(--card);border:1px solid var(--accent-border-dim);border-radius:20px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.12);animation:cardIn 0.35s cubic-bezier(0.34,1.56,0.64,1) both;}
+    @keyframes cardIn{from{opacity:0;transform:translateY(24px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+    /* ── Card header ── */
+    .card-header{padding:22px 24px 18px;border-bottom:1px solid var(--accent-border-dim);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
+    .job-ref{font-family:'Kanit',sans-serif;font-size:24px;font-weight:700;color:var(--text-primary);display:flex;align-items:center;gap:8px;}
+    .job-ref i{color:var(--accent-light);font-size:20px;}
+    .job-title{font-size:13px;color:var(--text-secondary);margin-top:3px;}
+    .header-badges{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+    .qty-block{text-align:right;flex-shrink:0;}
+    .qty-label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;}
+    .qty-val{font-family:'Kanit',sans-serif;font-size:26px;font-weight:700;color:var(--text-primary);}
+
+    /* ── Sections ── */
+    .vd-section{padding:20px 24px;border-bottom:1px solid var(--accent-border-dim);}
+    .vd-section:last-child{border-bottom:none;}
+    .vd-section-title{font-size:11px;font-weight:700;color:var(--accent-light);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:6px;}
+    .vd-section-title i{font-size:14px;}
+
+    /* ── Info grid ── */
+    .vd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    @media(max-width:400px){.vd-grid{grid-template-columns:1fr;}}
+    .vd-item{background:var(--input);border:1px solid var(--accent-border-dim);border-radius:10px;padding:12px 14px;transition:border-color 0.2s;}
+    .vd-item:hover{border-color:var(--accent-border);}
+    .vd-label{font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+    .vd-value{font-size:14px;color:var(--text-primary);font-weight:600;}
+    .vd-value.overdue{color:#f87171;}
+    .vd-remark{background:var(--input);border:1px solid var(--accent-border-dim);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--text-secondary);line-height:1.7;margin-top:10px;}
+
+    /* ── Badges ── */
+    .badge{font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;}
+    .badge-high{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2);}
+    .badge-mid{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.2);}
+    .badge-low{background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.2);}
+    .badge-pending{background:rgba(99,102,241,0.12);color:#a5b4fc;border:1px solid rgba(99,102,241,0.2);}
+    .badge-process{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.2);}
+    .badge-done{background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.2);}
+    .badge-cancel{background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.2);}
+    [data-theme="light"] .badge-high{background:#fef2f2;color:#dc2626;border-color:#fecaca;}
+    [data-theme="light"] .badge-mid{background:#fffbeb;color:#d97706;border-color:#fde68a;}
+    [data-theme="light"] .badge-process{background:#fffbeb;color:#d97706;border-color:#fde68a;}
+    [data-theme="light"] .badge-done{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0;}
+
+    /* ── Pipeline ── */
+    .vd-pipeline{display:flex;align-items:flex-start;justify-content:space-between;padding:10px 0 6px;gap:0;overflow-x:auto;scrollbar-width:none;}
+    .vd-pipeline::-webkit-scrollbar{display:none;}
+    .pipe-node{display:flex;align-items:center;flex:1;min-width:0;}
+    .pipe-step{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
+    .pipe-dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--accent-border-dim);background:var(--input);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--text-dim);transition:all 0.3s;}
+    .pipe-dot.done{background:var(--accent);border-color:var(--accent);color:#fff;}
+    .pipe-dot.active{background:rgba(245,158,11,0.15);border-color:#f59e0b;color:#fbbf24;}
+    @keyframes pulseRing{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0.4)}50%{box-shadow:0 0 0 6px rgba(245,158,11,0)}}
+    .pipe-dot.active{animation:pulseRing 2s ease infinite;}
+    .pipe-label{font-size:9px;font-weight:700;letter-spacing:0.5px;color:var(--text-dim);margin-top:5px;text-align:center;}
+    .pipe-label.done{color:var(--accent-light);}
+    .pipe-label.active{color:#fbbf24;}
+    .pipe-line{flex:1;height:2px;background:var(--accent-border-dim);margin:0 2px;margin-bottom:20px;}
+    .pipe-line.done{background:var(--accent);}
+
+    /* ── Progress bar ── */
+    .vd-prog-bar-wrap{margin-top:14px;}
+    .vd-prog-track{height:10px;background:var(--accent-border-dim);border-radius:5px;overflow:hidden;}
+    .vd-prog-bar{height:100%;border-radius:5px;transition:width 0.8s cubic-bezier(0.4,0,0.2,1);background:linear-gradient(90deg,var(--accent),#10b981);}
+    .vd-prog-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-top:6px;font-weight:500;}
+
+    /* ── Log list ── */
+    .vd-log-list{display:flex;flex-direction:column;gap:8px;}
+    .vd-log-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;background:var(--input);border:1px solid var(--accent-border-dim);transition:border-color 0.15s;}
+    .vd-log-item:hover{border-color:var(--accent-border);}
+    .vd-log-num{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:var(--accent-dim);border:1.5px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--accent-light);}
+    .vd-log-step{font-weight:700;color:var(--text-primary);font-size:13px;min-width:70px;}
+    .vd-log-by{font-size:12px;color:var(--text-secondary);flex:1;display:flex;align-items:center;gap:4px;}
+    .vd-log-time{font-size:11px;color:var(--text-dim);flex-shrink:0;}
+    .vd-log-empty{text-align:center;padding:20px;color:var(--text-dim);font-size:12px;}
+    @media(max-width:480px){.vd-log-time{display:none;}.vd-log-step{min-width:60px;}}
+
+    /* ── Loading/Error ── */
+    .state-box{width:100%;max-width:680px;text-align:center;padding:60px 20px;color:var(--text-dim);}
+    .state-box i{font-size:48px;display:block;margin-bottom:12px;opacity:0.5;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spinning{animation:spin 1s linear infinite;display:inline-block;}
+    .retry-btn{margin-top:16px;padding:9px 22px;background:var(--accent);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px;}
+    .retry-btn:hover{opacity:0.85;}
+
+    /* footer */
+    .footer{margin-top:20px;font-size:11px;color:var(--text-dim);text-align:center;display:flex;align-items:center;gap:6px;justify-content:center;}
+    .footer-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;animation:footerPulse 2s infinite;}
+    @keyframes footerPulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+    /* Light mode overrides */
+    [data-theme="light"] .topbar{box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+    [data-theme="light"] .view-card{box-shadow:0 8px 32px rgba(0,0,0,0.08);}
+
+    /* ══ RESPONSIVE ══════════════════════════════════════ */
+
+    /* PC wide - card กว้างขึ้น 2 คอลัมน์ */
+    @media(min-width:900px){
+      .view-card{max-width:760px;}
+      .topbar{max-width:760px;}
+      .state-box{max-width:760px;}
+      .vd-grid{grid-template-columns:1fr 1fr 1fr 1fr;}
+      .vd-pipeline .pipe-dot{width:44px;height:44px;font-size:18px;}
+      .vd-pipeline .pipe-label{font-size:10px;}
+      .card-header{padding:26px 30px 20px;}
+      .vd-section{padding:22px 30px;}
+      .job-ref{font-size:28px;}
+      .qty-val{font-size:30px;}
+    }
+
+    /* Tablet */
+    @media(min-width:600px) and (max-width:899px){
+      .vd-grid{grid-template-columns:1fr 1fr;}
+    }
+
+    /* Mobile */
+    @media(max-width:599px){
+      body{padding:12px 10px 40px;}
+      .topbar{padding:10px 14px;border-radius:12px;margin-bottom:16px;}
+      .brand-name{font-size:11px;letter-spacing:2px;}
+      .view-card{border-radius:16px;}
+      .card-header{padding:16px 16px 14px;}
+      .job-ref{font-size:20px;}
+      .qty-val{font-size:22px;}
+      .vd-section{padding:16px 16px;}
+      .vd-grid{grid-template-columns:1fr 1fr;}
+      .vd-item{padding:10px 12px;}
+      .vd-label{font-size:9px;}
+      .vd-value{font-size:13px;}
+      .pipe-dot{width:32px!important;height:32px!important;font-size:13px!important;}
+      .pipe-label{font-size:8px!important;}
+      .pipe-line{margin-bottom:16px!important;}
+      .vd-log-item{padding:10px 12px;}
+      .vd-log-step{font-size:12px;min-width:60px;}
+      .vd-log-time{display:none;}
+    }
+
+    /* Mobile XS */
+    @media(max-width:360px){
+      .vd-grid{grid-template-columns:1fr;}
+      .pipe-dot{width:28px!important;height:28px!important;font-size:11px!important;}
+      .pipe-label{font-size:7px!important;}
+    }
+
+    /* ── Realtime bar ── */
+    .rt-bar{width:100%;max-width:760px;display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-dim);margin-bottom:12px;padding:0 4px;}
+    .rt-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;}
+    .rt-dot.syncing{background:#f59e0b;animation:rtSpin 0.8s linear infinite;}
+    .rt-dot.error{background:#f87171;animation:none;}
+    @keyframes rtSpin{to{transform:rotate(360deg)}border-radius:0;clip-path:polygon(50% 0%,100% 100%,0% 100%);}
+    .rt-countdown{font-variant-numeric:tabular-nums;margin-left:auto;color:var(--text-dim);}
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon"><i class="ti ti-shield-lock"></i></div>
+      <span class="brand-name">Famous Tools</span>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-btn" id="theme-btn" onclick="toggleThemeLocal()"></button>
+      <span class="scan-badge">QR SCAN</span>
+    </div>
+  </div>
+
+  <div class="rt-bar" id="rt-bar" style="display:none">
+    <div class="rt-dot" id="rt-dot"></div>
+    <span id="rt-label">Live</span>
+<span id="rt-updated" style="margin-left:auto;font-size:11px;color:var(--text-dim)"></span>
+  </div>
+  <div id="app">
+    <div class="state-box">
+      <i class="ti ti-loader spinning" style="color:var(--accent-light)"></i>
+      <p id="loading-msg">กำลังโหลดข้อมูลงาน...</p>
+      <p id="loading-sub" style="font-size:11px;opacity:0.5;margin-top:6px"></p>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-dot"></div>
+    Famous Tools — Production Tracking
+  </div>
+
+  <script>
+    (function() { const mode = localStorage.getItem('themeMode')||'dark'; if(mode==='light') document.documentElement.setAttribute('data-theme','light'); else document.documentElement.removeAttribute('data-theme'); })();
+
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwHKKEiuTbGLUMM8sqX-DDyv8383Sz25XEKgQWOLLJKpu-iuoco-6CEAuh7WrurN-2r/exec';
+
+    function apiCall(params, timeoutMs=12000) {
+      return new Promise((resolve, reject) => {
+        const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        const script = document.createElement('script');
+        const timer = setTimeout(() => { reject(new Error('timeout')); delete window[cbName]; try{document.head.removeChild(script);}catch(e){} }, timeoutMs);
+        window[cbName] = function(data) { clearTimeout(timer); delete window[cbName]; try{document.head.removeChild(script);}catch(e){} resolve(data); };
+        script.onerror = () => { clearTimeout(timer); delete window[cbName]; reject(new Error('network')); };
+        const qs = new URLSearchParams({...params, callback: cbName}).toString();
+        script.src = `${API_URL}?${qs}`;
+        document.head.appendChild(script);
+      });
+    }
+
+    const STEPS = ['Cutting','Manual','CNC','QC','Coating','Finish'];
+    const STEP_ICONS = { Cutting:'ti-cut', Manual:'ti-circle', CNC:'ti-settings', QC:'ti-check', Coating:'ti-droplet', Finish:'ti-flag' };
+    const PCT = { Cutting:10, Manual:26, CNC:42, QC:58, Coating:74, Finish:100 };
+
+    function getRef() {
+      const p = new URLSearchParams(window.location.search);
+      return p.get('ref') || '';
+    }
+
+    function statusBadge(s) {
+      const v = String(s||'').toLowerCase();
+      let cls = 'badge-pending', icon = 'ti-clock';
+      if (v.includes('กำลัง')||v.includes('ดำเนิน')) { cls='badge-process'; icon='ti-loader-2'; }
+      else if (v.includes('สำเร็จ')||v.includes('เสร็จ')) { cls='badge-done'; icon='ti-circle-check'; }
+      else if (v.includes('ยกเลิก')) { cls='badge-cancel'; icon='ti-circle-x'; }
+      return `<span class="badge ${cls}"><i class="ti ${icon}" style="font-size:10px"></i>${s||'—'}</span>`;
+    }
+
+    function prioBadge(p) {
+      const v = String(p||'').toLowerCase();
+      let cls = 'badge-mid', icon = 'ti-flag';
+      if (v.includes('ด่วน')||v.includes('สูง')) { cls='badge-high'; icon='ti-alert-triangle'; }
+      else if (v.includes('ต่ำ')) { cls='badge-low'; icon='ti-flag'; }
+      return `<span class="badge ${cls}"><i class="ti ${icon}" style="font-size:10px"></i>${p||'ปกติ'}</span>`;
+    }
+
+    function formatDate(raw) {
+      if (!raw) return '—';
+      const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      const d = new Date(String(raw).replace('น.','').trim());
+      if (isNaN(d)) return raw;
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function formatDatetime(raw) {
+      if (!raw) return '—';
+      const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+      const d = new Date(String(raw).replace('น.','').trim());
+      if (isNaN(d)) return raw;
+      const hh = String(d.getHours()).padStart(2,'0'), mm = String(d.getMinutes()).padStart(2,'0');
+      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} ${hh}:${mm} น.`;
+    }
+
+    function renderPage(job, logs) {
+      const doneSet = new Set(logs.map(l => l.step));
+      const curStep = logs.length ? logs[logs.length-1].step : '';
+      const pct = PCT[curStep] || 0;
+      const isOverdue = job.duedate && new Date(job.duedate) < new Date();
+
+      const pipelineHtml = STEPS.map((s, si) => {
+        const isDone   = doneSet.has(s) && s !== curStep;
+        const isActive = s === curStep;
+        const cls = isDone ? 'done' : isActive ? 'active' : '';
+        const nextDone = si < STEPS.length-1 && (doneSet.has(STEPS[si+1]) || STEPS[si+1] === curStep);
+        return `
+          <div class="pipe-node">
+            <div class="pipe-step">
+              <div class="pipe-dot ${cls}"><i class="ti ${STEP_ICONS[s]}"></i></div>
+              <div class="pipe-label ${cls}">${s}</div>
+            </div>
+            ${si < STEPS.length-1 ? `<div class="pipe-line ${nextDone?'done':''}"></div>` : ''}
+          </div>`;
+      }).join('');
+
+      const histHtml = logs.length
+        ? logs.map((l,i) => `
+            <div class="vd-log-item">
+              <div class="vd-log-num">${i+1}</div>
+              <div class="vd-log-step">${l.step}</div>
+              <div class="vd-log-by"><i class="ti ti-user" style="font-size:11px"></i>${l.updatedBy||'—'}</div>
+              <div class="vd-log-time">${formatDatetime(l.updatedAt)}</div>
+            </div>`).join('')
+        : `<div class="vd-log-empty"><i class="ti ti-inbox" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4"></i>ยังไม่มีประวัติ</div>`;
+
+      document.getElementById('app').innerHTML = `
+        <div class="view-card">
+
+          <!-- Header -->
+          <div class="card-header">
+            <div>
+              <div class="job-ref"><i class="ti ti-eye"></i>${job.ref||'—'}</div>
+              <div class="job-title">${job.title||'—'}</div>
+              <div class="header-badges">${statusBadge(job.status)} ${prioBadge(job.priority)}</div>
+            </div>
+            ${job.qty ? `<div class="qty-block"><div class="qty-label">จำนวน</div><div class="qty-val">×${job.qty}</div></div>` : ''}
+          </div>
+
+          <!-- ข้อมูลงาน -->
+          <div class="vd-section">
+            <div class="vd-section-title"><i class="ti ti-info-circle"></i>ข้อมูลงาน</div>
+            <div class="vd-grid">
+              <div class="vd-item">
+                <div class="vd-label">รหัสสินค้า</div>
+                <div class="vd-value">${job.ref||'—'}</div>
+              </div>
+              <div class="vd-item">
+                <div class="vd-label">จำนวน</div>
+                <div class="vd-value">${job.qty||'—'}</div>
+              </div>
+              <div class="vd-item">
+                <div class="vd-label">วันที่เพิ่ม</div>
+                <div class="vd-value">${formatDate(job.startdate)}</div>
+              </div>
+              <div class="vd-item">
+                <div class="vd-label">กำหนดส่ง</div>
+                <div class="vd-value ${isOverdue?'overdue':''}">${formatDate(job.duedate)||'—'}${isOverdue?' ⚠️':''}</div>
+              </div>
+            </div>
+            ${job.remark ? `<div style="margin-top:10px"><div class="vd-label" style="margin-bottom:6px;padding-left:2px"><i class="ti ti-notes" style="font-size:11px;margin-right:4px"></i>REMARK</div><div class="vd-remark">${job.remark}</div></div>` : ''}
+          </div>
+
+          <!-- ขั้นตอนการผลิต -->
+          <div class="vd-section">
+            <div class="vd-section-title"><i class="ti ti-route"></i>ขั้นตอนการผลิต</div>
+            <div class="vd-pipeline">${pipelineHtml}</div>
+            <div class="vd-prog-bar-wrap">
+              <div class="vd-prog-track"><div class="vd-prog-bar" id="prog-bar" style="width:0%"></div></div>
+              <div class="vd-prog-meta">
+                <span>${curStep||'ยังไม่เริ่ม'}</span>
+                <span>${pct}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ประวัติขั้นตอน -->
+          <div class="vd-section">
+            <div class="vd-section-title"><i class="ti ti-history"></i>ประวัติขั้นตอน</div>
+            <div class="vd-log-list">${histHtml}</div>
+          </div>
+
+        </div>`;
+
+      setTimeout(() => {
+        const bar = document.getElementById('prog-bar');
+        if (bar) bar.style.width = pct + '%';
+      }, 150);
+    }
+
+    function showError(msg) {
+      document.getElementById('app').innerHTML = `
+        <div class="state-box">
+          <i class="ti ti-alert-circle" style="color:#f87171"></i>
+          <p style="color:#f87171;font-weight:600;margin-bottom:8px">${msg}</p>
+          <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px">กรุณาตรวจสอบ QR Code หรือติดต่อเจ้าหน้าที่</p>
+          <button class="retry-btn" onclick="location.reload()"><i class="ti ti-refresh" style="font-size:13px"></i>ลองใหม่</button>
+        </div>`;
+    }
+
+    function toggleThemeLocal() {
+      const cur = localStorage.getItem('themeMode') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('themeMode', next);
+      if (next === 'light') document.documentElement.setAttribute('data-theme','light');
+      else document.documentElement.removeAttribute('data-theme');
+      updateThemeBtn();
+    }
+    function updateThemeBtn() {
+      const btn = document.getElementById('theme-btn');
+      if (!btn) return;
+      const mode = localStorage.getItem('themeMode') || 'dark';
+      btn.innerHTML = mode === 'dark'
+        ? '<i class="ti ti-sun"></i>'
+        : '<i class="ti ti-moon"></i>';
+      btn.title = mode === 'dark' ? 'โหมดสว่าง' : 'โหมดมืด';
+    }
+
+    function setLoadMsg(msg, sub) {
+      const el = document.getElementById('loading-msg');
+      const el2 = document.getElementById('loading-sub');
+      if (el) el.textContent = msg;
+      if (el2 && sub) el2.textContent = sub;
+    }
+
+    async function init() {
+      updateThemeBtn();
+      const ref = getRef();
+      if (!ref) { showError('ไม่พบรหัสงาน'); return; }
+      document.title = 'สถานะงาน: ' + ref;
+      setLoadMsg('กำลังโหลดข้อมูล...', 'ใช้เวลาประมาณ 5-15 วินาที');
+      try {
+        const [dataRes, logRes] = await Promise.all([
+          apiCall({ action:'getDataByRef', ref }, 25000),
+          apiCall({ action:'getProductionLog', ref }, 25000)
+        ]);
+        if (!dataRes.success) { showError('โหลดไม่สำเร็จ — กดลองใหม่'); return; }
+        const job = dataRes.data;
+        if (!job) { showError('ไม่พบงาน "' + ref + '" ในระบบ'); return; }
+        renderPage(job, logRes.success ? (logRes.data||[]) : []);
+      } catch(e) {
+        showError('เชื่อมต่อไม่ได้ — กดลองใหม่');
+      }
+    }
+
+    const loadTimeout = setTimeout(() => {
+      if (document.querySelector('.spinning')) showError('โหลดนานเกินไป — กดลองใหม่');
+    }, 25000);
+
+    // ── REALTIME (smart polling 10s, re-render เฉพาะเมื่อข้อมูลเปลี่ยน) ──
+    const RT_INTERVAL = 10000;
+    let rtTimer = null;
+    let lastSnapshot = '';
+
+    function snapshot(job, logs) {
+      return JSON.stringify({ step: job.step, status: job.status, logs: logs.length, lastLog: logs[logs.length-1]?.updatedAt||'' });
+    }
+
+    function setRtStatus(state) {
+      const dot = document.getElementById('rt-dot');
+      const lbl = document.getElementById('rt-label');
+      const bar = document.getElementById('rt-bar');
+      if (!dot) return;
+      if (bar) bar.style.display = 'flex';
+      dot.className = 'rt-dot' + (state==='syncing'?' syncing':state==='error'?' error':'');
+      if (lbl) lbl.textContent = state==='syncing' ? 'กำลังเช็ค...' : state==='error' ? 'เชื่อมต่อไม่ได้' : 'Live';
+    }
+
+    async function refresh() {
+      const ref = getRef();
+      if (!ref) return;
+      setRtStatus('syncing');
+      try {
+        const [dataRes, logRes] = await Promise.all([
+          apiCall({ action:'getDataByRef', ref }, 15000),
+          apiCall({ action:'getProductionLog', ref }, 15000)
+        ]);
+        if (dataRes.success && dataRes.data) {
+          const logs = logRes.success ? (logRes.data||[]) : [];
+          const snap = snapshot(dataRes.data, logs);
+          if (snap !== lastSnapshot) {
+            lastSnapshot = snap;
+            renderPage(dataRes.data, logs);
+            // flash แจ้งเตือนว่ามีการอัปเดต
+            const bar = document.getElementById('rt-bar');
+            if (bar && lastSnapshot) {
+              bar.style.background = 'rgba(34,197,94,0.08)';
+              setTimeout(() => { bar.style.background = ''; }, 1500);
+            }
+          }
+          setRtStatus('live');
+        } else {
+          setRtStatus('error');
+        }
+      } catch(e) {
+        setRtStatus('error');
+      }
+    }
+
+    function startRealtime() {
+      clearInterval(rtTimer);
+      rtTimer = setInterval(refresh, RT_INTERVAL);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        clearInterval(rtTimer);
+      } else {
+        refresh().then(() => startRealtime());
+      }
+    });
+
+    init().finally(() => {
+      clearTimeout(loadTimeout);
+      if (!document.querySelector('.spinning')) {
+        setRtStatus('live');
+        startRealtime();
+      }
+    });
+  </script>
+</body>
+</html>

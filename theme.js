@@ -12,13 +12,8 @@
   }
 })();
 
-// ═══════════════════════════════════════════════════════
-//   FAMOUS TOOLS — theme.js
-//   Shared: Theme, Sidebar, API, Toast, Auth guard
-// ═══════════════════════════════════════════════════════
-
 // ── API ────────────────────────────────────────────────
-const API_URL = 'https://script.google.com/macros/s/AKfycbyU3aHPX5OYHQnMnVa11ewP6sulAxY35ds5O5z6INNWjyfUVN74oIh54cIWKlAsQ9p0/exec';
+const API_URL = 'https://script.google.com/macros/s/AKfycbwHKKEiuTbGLUMM8sqX-DDyv8383Sz25XEKgQWOLLJKpu-iuoco-6CEAuh7WrurN-2r/exec';
 
 function apiCall(params, timeoutMs = 12000) {
   return new Promise((resolve, reject) => {

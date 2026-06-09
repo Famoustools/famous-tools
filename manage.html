@@ -140,17 +140,20 @@
     </div>
     <div class="sidebar-menu">
       <div class="menu-label-group">หลัก</div>
+      <div class="menu-item" data-tooltip="งานล่าสุด" onclick="location.href='recent.html'">
+        <i class="ti ti-clock"></i><span class="menu-label">งานล่าสุด</span>
+      </div>
       <div class="menu-item" data-tooltip="Dashboard" onclick="location.href='dashboard1.html'">
         <i class="ti ti-layout-dashboard"></i><span class="menu-label">Dashboard</span>
       </div>
       <div class="menu-item active" data-tooltip="จัดการงาน">
         <i class="ti ti-list-check"></i><span class="menu-label">จัดการงาน</span>
       </div>
-      <div class="menu-item" data-tooltip="กระบวนการผลิต" onclick="location.href='production.html'">
-        <i class="ti ti-route"></i><span class="menu-label">กระบวนการผลิต</span>
-      </div>
       <div class="menu-item" id="sidebar-btn-add" data-tooltip="เพิ่มงานใหม่" onclick="location.href='addwork.html'" style="display:none">
         <i class="ti ti-plus"></i><span class="menu-label">เพิ่มงาน</span>
+      </div>
+      <div class="menu-item" data-tooltip="กระบวนการผลิต" onclick="location.href='production.html'">
+        <i class="ti ti-route"></i><span class="menu-label">กระบวนการผลิต</span>
       </div>
       <div class="menu-label-group admin-label">ผู้ดูแล</div>
       <div class="menu-item admin-item" data-tooltip="จัดการ User" onclick="location.href='users.html'">
@@ -244,8 +247,8 @@
             <thead>
               <tr>
                 <th style="width:40px">#</th>
+                <th>Ref</th>
                 <th class="sortable" id="th-title" onclick="sortBy('title')">ชื่องาน <i class="ti ti-selector sort-icon"></i></th>
-<th>Ref</th>
                 <th class="sortable" id="th-qty" onclick="sortBy('qty')">จำนวน <i class="ti ti-selector sort-icon"></i></th>
                 <th class="sortable" id="th-priority" onclick="sortBy('priority')">Priority <i class="ti ti-selector sort-icon"></i></th>
                 <th class="sortable" id="th-status" onclick="sortBy('status')">Status <i class="ti ti-selector sort-icon"></i></th>
@@ -313,7 +316,7 @@
   <script>
     authGuard('view');
     let allData=[],filtered=[],editId=null,deleteId=null;
-    let currentFilter='all',sortField='',sortAsc=true,page=1;
+    let currentFilter='all',sortField='id',sortAsc=false,page=1;
     const PAGE_SIZE=10;
     const CAN_ADD=hasPerm('add'),CAN_EDIT=hasPerm('edit'),CAN_DELETE=hasPerm('delete'),CAN_EXPORT=hasPerm('export');
     if(CAN_ADD){['btn-add','sidebar-btn-add'].forEach(id=>{const b=document.getElementById(id);if(b)b.style.display='';})}
@@ -360,7 +363,7 @@
         const mS=!q||[d.ref,d.title,d.status,d.priority].some(v=>String(v||'').toLowerCase().includes(q));
         return mF&&mP&&mS;
       });
-      if(sortField){filtered.sort((a,b)=>{let va=a[sortField]||'',vb=b[sortField]||'';if(sortField==='qty'){va=parseFloat(va)||0;vb=parseFloat(vb)||0;}const c=va<vb?-1:va>vb?1:0;return sortAsc?c:-c;});}
+      if(sortField){filtered.sort((a,b)=>{let va=a[sortField]||'',vb=b[sortField]||'';if(sortField==='qty'||sortField==='id'){va=parseInt(va)||0;vb=parseInt(vb)||0;}const c=va<vb?-1:va>vb?1:0;return sortAsc?c:-c;});}
       document.getElementById('badge-count').textContent=filtered.length;
       renderPage();
     }
@@ -379,7 +382,7 @@
         let dueHtml=`<span style="color:var(--text-secondary)">${dueFmt}</span>`;
         if(d.duedate){const diff=(new Date(d.duedate)-today)/86400000;if(diff<0)dueHtml=`<span class="due-overdue"><i class="ti ti-alert-triangle" style="font-size:11px"></i> ${dueFmt}</span>`;else if(diff<=3)dueHtml=`<span class="due-soon"><i class="ti ti-bell-ringing" style="font-size:11px"></i> ${dueFmt}</span>`;}
         const actions=(CAN_EDIT||CAN_DELETE)?`<td style="text-align:center">${CAN_EDIT?`<button class="act-btn" onclick="openEdit('${d.id}')" title="แก้ไข"><i class="ti ti-edit"></i></button>`:''} ${CAN_DELETE?`<button class="act-btn danger" onclick="askDelete('${d.id}','${String(d.title||'').replace(/'/g,"\\'")}')  " title="ลบ"><i class="ti ti-trash"></i></button>`:''}</td>`:'';
-        return `<tr class="row-enter" style="animation-delay:${i*15}ms"><td style="color:var(--text-dim);font-size:11px">${start+i+1}</td><td style="color:var(--text-primary);font-weight:600;max-width:180px">${String(d.title||'—')}</td><td>${String(d.ref||'—')}</td><td>${String(d.qty||'0')}</td><td><span class="badge ${pC}">${d.priority||'—'}</span></td><td><span class="badge ${sC}">${d.status||'—'}</span></td><td>${dueHtml}</td>${actions}</tr>`;
+        return `<tr class="row-enter" style="animation-delay:${i*15}ms"><td style="color:var(--text-dim);font-size:11px">${start+i+1}</td><td style="color:var(--text-primary);font-weight:600">${String(d.ref||'—')}</td><td style="max-width:180px">${String(d.title||'—')}</td><td>${String(d.qty||'0')}</td><td><span class="badge ${pC}">${d.priority||'—'}</span></td><td><span class="badge ${sC}">${d.status||'—'}</span></td><td>${dueHtml}</td>${actions}</tr>`;
       }).join('');
       renderPagination(total,maxPage);
     }
