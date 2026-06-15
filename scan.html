@@ -212,28 +212,15 @@
   <script>
     (function() { const mode = localStorage.getItem('themeMode')||'dark'; if(mode==='light') document.documentElement.setAttribute('data-theme','light'); else document.documentElement.removeAttribute('data-theme'); })();
 
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzCkStaLvhTB7Agr4e_A0C4o6Y-jxvFb1O7L4KMq6lxByX1OVKJmyoHt0IKe8p_XSJO/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbz8XKjsEnctS58aXOBDFatyHNVmh-dVXvJFPPk1O2OxomNWr0ju7dGaP_krO0__r2rp/exec';
 
-    function apiCall(params, timeoutMs=30000) {
+    function apiCall(params, timeoutMs=12000) {
       return new Promise((resolve, reject) => {
         const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
         const script = document.createElement('script');
-        const timer = setTimeout(() => {
-          reject(new Error('timeout'));
-          delete window[cbName];
-          try { document.head.removeChild(script); } catch(e) {}
-        }, timeoutMs);
-        window[cbName] = function(data) {
-          clearTimeout(timer);
-          delete window[cbName];
-          try { document.head.removeChild(script); } catch(e) {}
-          resolve(data);
-        };
-        script.onerror = () => {
-          clearTimeout(timer);
-          delete window[cbName];
-          reject(new Error('network'));
-        };
+        const timer = setTimeout(() => { reject(new Error('timeout')); delete window[cbName]; try{document.head.removeChild(script);}catch(e){} }, timeoutMs);
+        window[cbName] = function(data) { clearTimeout(timer); delete window[cbName]; try{document.head.removeChild(script);}catch(e){} resolve(data); };
+        script.onerror = () => { clearTimeout(timer); delete window[cbName]; reject(new Error('network')); };
         const qs = new URLSearchParams({...params, callback: cbName}).toString();
         script.src = `${API_URL}?${qs}`;
         document.head.appendChild(script);
@@ -378,13 +365,13 @@
       }, 150);
     }
 
-    function showError(msg, isNotFound = false) {
+    function showError(msg) {
       document.getElementById('app').innerHTML = `
         <div class="state-box">
           <i class="ti ti-alert-circle" style="color:#f87171"></i>
           <p style="color:#f87171;font-weight:600;margin-bottom:8px">${msg}</p>
-          <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px">${isNotFound ? 'กรุณาตรวจสอบ QR Code หรือติดต่อเจ้าหน้าที่' : 'เครือข่ายช้าหรือ server ยังไม่พร้อม — ลองใหม่ได้เลย'}</p>
-          ${!isNotFound ? `<button class="retry-btn" onclick="retryInit()"><i class="ti ti-refresh" style="font-size:13px"></i>ลองใหม่</button>` : ''}
+          <p style="font-size:12px;color:var(--text-dim);margin-bottom:16px">กรุณาตรวจสอบ QR Code หรือติดต่อเจ้าหน้าที่</p>
+          <button class="retry-btn" onclick="location.reload()"><i class="ti ti-refresh" style="font-size:13px"></i>ลองใหม่</button>
         </div>`;
     }
 
@@ -413,71 +400,29 @@
       if (el2 && sub) el2.textContent = sub;
     }
 
-    let retryCount = 0;
-    const MAX_RETRY = 3;
-
-    function retryInit() {
-      retryCount++;
-      document.getElementById('app').innerHTML = `
-        <div class="state-box">
-          <i class="ti ti-loader spinning" style="color:var(--accent-light)"></i>
-          <p id="loading-msg">กำลังเชื่อมต่อ... (ครั้งที่ ${retryCount + 1})</p>
-          <p id="loading-sub" style="font-size:11px;opacity:0.5;margin-top:6px">รอสักครู่...</p>
-        </div>`;
-      init();
-    }
-
     async function init() {
       updateThemeBtn();
       const ref = getRef();
-      if (!ref) { showError('ไม่พบรหัสงาน', true); return; }
+      if (!ref) { showError('ไม่พบรหัสงาน'); return; }
       document.title = 'สถานะงาน: ' + ref;
-
-      const timeoutMs = retryCount === 0 ? 30000 : 20000;
-      setLoadMsg(
-        retryCount === 0 ? 'กำลังโหลดข้อมูล...' : `กำลังเชื่อมต่อ... (ครั้งที่ ${retryCount + 1})`,
-        retryCount === 0 ? 'ครั้งแรกอาจใช้เวลา 10–20 วินาที' : 'ใช้เวลาสักครู่...'
-      );
-
+      setLoadMsg('กำลังโหลดข้อมูล...', 'ใช้เวลาประมาณ 5-15 วินาที');
       try {
-        // โหลด data ก่อน — ได้แล้วค่อย render เลย ไม่ต้องรอ log
-        const dataRes = await apiCall({ action:'getDataByRef', ref }, timeoutMs);
-        if (!dataRes.success) {
-          if (retryCount < MAX_RETRY) {
-            setLoadMsg(`โหลดไม่สำเร็จ กำลังลองใหม่...`, `(${retryCount + 1}/${MAX_RETRY + 1})`);
-            setTimeout(() => { retryCount++; init(); }, 2000);
-            return;
-          }
-          showError('โหลดไม่สำเร็จ — กดลองใหม่'); return;
-        }
+        const [dataRes, logRes] = await Promise.all([
+          apiCall({ action:'getDataByRef', ref }, 25000),
+          apiCall({ action:'getProductionLog', ref }, 25000)
+        ]);
+        if (!dataRes.success) { showError('โหลดไม่สำเร็จ — กดลองใหม่'); return; }
         const job = dataRes.data;
-        if (!job) { showError('ไม่พบงาน "' + ref + '" ในระบบ', true); return; }
-
-        // render ทันทีโดยไม่รอ log
-        renderPage(job, []);
-
-        // โหลด log ตามหลัง (ไม่ block)
-        try {
-          const logRes = await apiCall({ action:'getProductionLog', ref }, 15000);
-          const logs = logRes.success ? (logRes.data || []) : [];
-          renderPage(job, logs);
-          lastSnapshot = snapshot(job, logs);
-        } catch(e) {
-          // log โหลดไม่ได้ก็แสดงแค่ข้อมูลงาน — ไม่ error
-        }
-
+        if (!job) { showError('ไม่พบงาน "' + ref + '" ในระบบ'); return; }
+        renderPage(job, logRes.success ? (logRes.data||[]) : []);
       } catch(e) {
-        if (retryCount < MAX_RETRY) {
-          const delay = [4000, 6000, 10000][retryCount] || 6000;
-          setLoadMsg(`เชื่อมต่อไม่ได้ กำลังลองใหม่ใน ${delay/1000} วิ...`, `(${retryCount + 1}/${MAX_RETRY + 1})`);
-          setTimeout(() => { retryCount++; init(); }, delay);
-          return;
-        }
         showError('เชื่อมต่อไม่ได้ — กดลองใหม่');
       }
     }
 
-    // loadTimeout ถูกแทนที่ด้วย auto-retry ใน init() แล้ว
+    const loadTimeout = setTimeout(() => {
+      if (document.querySelector('.spinning')) showError('โหลดนานเกินไป — กดลองใหม่');
+    }, 25000);
 
     // ── REALTIME (smart polling 10s, re-render เฉพาะเมื่อข้อมูลเปลี่ยน) ──
     const RT_INTERVAL = 10000;
@@ -543,6 +488,7 @@
     });
 
     init().finally(() => {
+      clearTimeout(loadTimeout);
       if (!document.querySelector('.spinning')) {
         setRtStatus('live');
         startRealtime();
