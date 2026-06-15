@@ -215,52 +215,28 @@
     const API_URL = 'https://script.google.com/macros/s/AKfycbz8XKjsEnctS58aXOBDFatyHNVmh-dVXvJFPPk1O2OxomNWr0ju7dGaP_krO0__r2rp/exec';
 
     function apiCall(params, timeoutMs=30000) {
-      const url = API_URL + '?' + new URLSearchParams(params).toString();
-      // ลอง fetch ก่อน (ไม่ติด JSONP block)
       return new Promise((resolve, reject) => {
-        let settled = false;
-        const ctrl = new AbortController();
-        const timer = setTimeout(() => { ctrl.abort(); }, timeoutMs);
-
-        fetch(url, { signal: ctrl.signal })
-          .then(r => r.json())
-          .then(data => {
-            clearTimeout(timer);
-            if (settled) return;
-            settled = true;
-            resolve(data);
-          })
-          .catch(() => {
-            clearTimeout(timer);
-            if (settled) return;
-            // fetch ไม่ได้ → fallback JSONP
-            const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
-            const script = document.createElement('script');
-            const t2 = setTimeout(() => {
-              if (settled) return;
-              settled = true;
-              delete window[cbName];
-              try { document.head.removeChild(script); } catch(e) {}
-              reject(new Error('timeout'));
-            }, timeoutMs);
-            window[cbName] = function(data) {
-              clearTimeout(t2);
-              delete window[cbName];
-              try { document.head.removeChild(script); } catch(e) {}
-              if (settled) return;
-              settled = true;
-              resolve(data);
-            };
-            script.onerror = () => {
-              clearTimeout(t2);
-              delete window[cbName];
-              if (settled) return;
-              settled = true;
-              reject(new Error('network'));
-            };
-            script.src = url + '&callback=' + cbName;
-            document.head.appendChild(script);
-          });
+        const cbName = 'cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+        const script = document.createElement('script');
+        const timer = setTimeout(() => {
+          reject(new Error('timeout'));
+          delete window[cbName];
+          try { document.head.removeChild(script); } catch(e) {}
+        }, timeoutMs);
+        window[cbName] = function(data) {
+          clearTimeout(timer);
+          delete window[cbName];
+          try { document.head.removeChild(script); } catch(e) {}
+          resolve(data);
+        };
+        script.onerror = () => {
+          clearTimeout(timer);
+          delete window[cbName];
+          reject(new Error('network'));
+        };
+        const qs = new URLSearchParams({...params, callback: cbName}).toString();
+        script.src = `${API_URL}?${qs}`;
+        document.head.appendChild(script);
       });
     }
 
