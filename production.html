@@ -837,10 +837,13 @@
         list.forEach(d => {
           const el = document.getElementById('log-' + d.id);
           if (!el) return;
-          const row = res.data.find(r =>
-            (d.ref   && String(r.ref   || '').trim() === String(d.ref   || '').trim()) ||
-            (d.title && String(r.title || '').trim() === String(d.title || '').trim())
-          );
+          // ✅ แก้ไข: ใช้ ref เป็นหลักเสมอ (unique key) กัน title ซ้ำข้ามใบงานแล้ว match ผิด
+          let row = null;
+          if (d.ref) {
+            row = res.data.find(r => String(r.ref || '').trim() === String(d.ref).trim());
+          } else if (d.title) {
+            row = res.data.find(r => String(r.title || '').trim() === String(d.title).trim());
+          }
           if (row) {
             const items = HIST_STEPS.filter(s => row[s.key]).map(s => `
               <div class="step-log-item">
@@ -933,8 +936,15 @@
       const STEP_NAMES = ['Cutting','Manual','CNC','QC','Coating','Finish'];
       const sk = STEP_KEY[newStep];
       if (sk) {
-        let row = allHistory.find(r => String(r.ref||'').trim() === String(d.ref||'').trim()
-                                    || String(r.title||'').trim() === String(d.title||'').trim());
+        // ✅ แก้ไข: เดิม match ด้วย ref OR title ถ้ามี 2 ใบงาน title ซ้ำกัน
+        // (เช่น ref 222 กับ 444 ทั้งคู่ title="111") จะดันไปเขียนทับ history ของใบงานอื่นผิดตัว
+        // ตอนนี้ match ด้วย ref เป็นหลักเสมอ fallback ไป title ก็ต่อเมื่อไม่มี ref เท่านั้น
+        let row = null;
+        if (d.ref) {
+          row = allHistory.find(r => String(r.ref || '').trim() === String(d.ref).trim());
+        } else if (d.title) {
+          row = allHistory.find(r => String(r.title || '').trim() === String(d.title).trim());
+        }
         if (!row) {
           row = { ref:d.ref||'', title:d.title||'' };
           allHistory.push(row);
@@ -1104,11 +1114,17 @@
       ];
       Promise.resolve({ success:true, data:allHistory }).then(res => {
         if (res.success && res.data) {
-          // หา row ที่ตรงกับงานนี้ (match ref หรือ title)
-          const row = res.data.find(r =>
-            (d.ref   && String(r.ref   || '').trim() === String(d.ref   || '').trim()) ||
-            (d.title && String(r.title || '').trim() === String(d.title || '').trim())
-          );
+          // หา row ที่ตรงกับงานนี้
+          // ✅ แก้ไข: เดิมใช้ OR ระหว่าง ref กับ title ทำให้ถ้ามี 2 ใบงานที่ title ซ้ำกัน
+          // (เช่น ref 222 กับ 444 ทั้งคู่ title = "111") อาจไป match ผิดใบงานได้
+          // ตอนนี้บังคับให้ใช้ ref เป็นหลักเสมอ (เป็น unique key จริง)
+          // และ fallback ไปใช้ title ก็ต่อเมื่อใบงานนี้ไม่มี ref เท่านั้น
+          let row = null;
+          if (d.ref) {
+            row = res.data.find(r => String(r.ref || '').trim() === String(d.ref).trim());
+          } else if (d.title) {
+            row = res.data.find(r => String(r.title || '').trim() === String(d.title).trim());
+          }
           if (row) {
             // แปลง s1..s6 เป็น log items เฉพาะที่มีค่า
             const items = HIST_STEPS
