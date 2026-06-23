@@ -216,7 +216,7 @@
                 <th>ชื่องาน</th>
                 <th>สถานะ</th>
                 <th>วันที่เพิ่ม</th>
-                <th>เวลาเริ่มผลิต</th>
+                <th>อัพเดตล่าสุด</th>
                 <th style="text-align:right">ขั้นตอนที่ผ่าน</th>
               </tr>
             </thead>
@@ -327,7 +327,7 @@
           <td>${r.title||'—'}</td>
           <td><span class="${sCls}">${r.status||'—'}</span></td>
           <td style="font-size:12px;color:var(--text-secondary)">${dateStr}</td>
-          <td style="font-size:12px;color:var(--text-dim)">${formatDatetime(r.timeStart)}</td>
+          <td style="font-size:12px;color:var(--text-dim)">${formatDatetime((['s6at','s5at','s4at','s3at','s2at','s1at'].find(k=>r[k])&&r[['s6at','s5at','s4at','s3at','s2at','s1at'].find(k=>r[k])])||'—')}</td>
           <td style="text-align:right">
             <span>${badges||'<span style="color:var(--text-dim);font-size:11px">ยังไม่มี</span>'}</span>
             <button class="expand-btn" onclick="toggleDetail(${i})" id="btn-${i}" style="margin-left:8px">
