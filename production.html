@@ -648,22 +648,55 @@
     const PROG_COLOR = { Cutting:'#60a5fa', Manual:'#818cf8', CNC:'#f59e0b', QC:'#4ade80', Coating:'#f97316', Finish:'#22c55e', '':'#64748b' };
     const STATUS_NUM = { รอดำเนินการ:0, กำลังทำ:1, สำเร็จ:2, ยกเลิก:3 };
 
+    const THAI_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+    // แกะวันที่แบบไม่พึ่งการเดารูปแบบของ new Date(string) เลย (ซึ่งเดาแบบเดือน/วันแบบอเมริกัน ทำให้ค่า
+    // "02/07/2569" ถูกอ่านผิดเป็น 7 ก.พ. แทนที่จะเป็น 2 ก.ค.) รองรับ วัน/เดือน/ปี(พ.ศ.หรือค.ศ.) [เวลา] และ ISO string
+    // คืนค่า {day, month(1-12), year(ค.ศ.), hour, minute} หรือ null ถ้าแกะไม่ได้
+    function parseThaiDatetime(raw) {
+      if (!raw) return null;
+      const s = String(raw).replace('น.', '').trim();
+
+      // รูปแบบไทย/สเปรดชีต: D/M/YYYY หรือ DD-MM-YYYY [HH:mm[:ss]]  (ลำดับ วัน/เดือน/ปี เสมอ)
+      let m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+      if (m) {
+        const day = parseInt(m[1], 10);
+        const month = parseInt(m[2], 10);
+        let year = parseInt(m[3], 10);
+        if (year > 2400) year -= 543; // เก็บเป็น พ.ศ. อยู่แล้ว → แปลงเป็น ค.ศ.
+        return { day, month, year, hour: m[4] ? parseInt(m[4], 10) : null, minute: m[5] ? parseInt(m[5], 10) : null };
+      }
+
+      // รูปแบบ ISO ไม่กำกวม: YYYY-MM-DD[THH:mm...]
+      m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2}))?/);
+      if (m) {
+        let year = parseInt(m[1], 10);
+        if (year > 2400) year -= 543;
+        return { day: parseInt(m[3], 10), month: parseInt(m[2], 10), year, hour: m[4] ? parseInt(m[4], 10) : null, minute: m[5] ? parseInt(m[5], 10) : null };
+      }
+
+      // fallback สุดท้าย: ให้ Date เดา แล้วกันปี พ.ศ. ซ้อนไว้
+      const d = new Date(s);
+      if (isNaN(d)) return null;
+      let year = d.getFullYear();
+      if (year > new Date().getFullYear() + 100) year -= 543;
+      return { day: d.getDate(), month: d.getMonth() + 1, year, hour: d.getHours(), minute: d.getMinutes() };
+    }
+
     function formatThaiDate(s) {
-      if (!s) return '—';
-      const d = new Date(s); if (isNaN(d)) return s;
-      return d.toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric', timeZone:'Asia/Bangkok' });
+      const p = parseThaiDatetime(s);
+      if (!p) return s || '—';
+      return `${p.day} ${THAI_MONTHS[p.month - 1]} ${p.year + 543}`;
     }
 
     function formatDatetime(raw) {
       if (!raw || raw === '—') return '—';
-      if (/^\d{2}\/\d{2}\/\d{4}/.test(raw)) return raw;
-      // ลบ "น." ออกก่อน parse เช่น "2026-06-03 14:54น."
-      const cleaned = String(raw).replace('น.', '').trim();
-      const d = new Date(cleaned);
-      if (isNaN(d)) return raw;
-      const datePart = d.toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric', timeZone:'Asia/Bangkok' });
-      const hh  = String(d.getHours()).padStart(2, '0');
-      const min = String(d.getMinutes()).padStart(2, '0');
+      const p = parseThaiDatetime(raw);
+      if (!p) return raw;
+      const datePart = `${p.day} ${THAI_MONTHS[p.month - 1]} ${p.year + 543}`;
+      if (p.hour === null) return datePart;
+      const hh = String(p.hour).padStart(2, '0');
+      const min = String(p.minute).padStart(2, '0');
       return `${datePart} ${hh}:${min}`;
     }
 
